@@ -6,7 +6,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 // hier mein testkommi
 
 public class MainClass extends ApplicationAdapter {
-	int = 42;
+	int a = 45;
 
 	@Override
 	public void create () {
