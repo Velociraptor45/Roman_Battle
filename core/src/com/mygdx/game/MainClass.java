@@ -7,6 +7,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 
 public class MainClass extends ApplicationAdapter {
 	int a = 45;
+	int b = 42;
 
 	@Override
 	public void create () {
