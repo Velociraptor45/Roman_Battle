@@ -12,6 +12,6 @@ public class AndroidLauncher extends AndroidApplication {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		initialize(new MainClass(), config);
-		setContentView(R.layout.main_menu);
+		setContentView(R.layout.main_menu); //test
 	}
 }
