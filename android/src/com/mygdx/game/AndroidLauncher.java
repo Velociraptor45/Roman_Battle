@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -13,5 +14,9 @@ public class AndroidLauncher extends AndroidApplication {
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		initialize(new MainClass(), config);
 		setContentView(R.layout.main_menu); //test
+
+		Intent i = new Intent(this, GameActivity.class);
+		startActivity(i);
 	}
+
 }
