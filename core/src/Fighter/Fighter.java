@@ -5,4 +5,5 @@ package Fighter;
  */
 
 public class Fighter {
+
 }
