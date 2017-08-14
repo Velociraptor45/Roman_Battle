@@ -2,12 +2,14 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
+
 import Fighter.Player;
+import Fighter.TestGround;
 
 /**
  * Created by david on 12.08.2017.
@@ -17,50 +19,70 @@ import Fighter.Player;
 // Here are control elements, player, enemy....
 
 public class GameClass implements Screen, GestureDetector.GestureListener {
-
-    //private AI enemy;
-    private TextureAtlas textureAtlas;
-    private Player player;
-    private Sprite sprite;
     private MainClass mainClass;
+    private Player player;
+    private World world;
+    private TestGround ground;
+    private OrthographicCamera camera;
+    private Box2DDebugRenderer dDebugRenderer;
+    private int PPM = 100; //TODO auslagern
+
+
+
 
 
     // we need the MainClass Objekt to access the SpriteBatch
     public GameClass(MainClass mainClass){
         this.mainClass = mainClass;
+        Gdx.input.setInputProcessor(new GestureDetector (this));
 
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false,Gdx.graphics.getWidth()/PPM,Gdx.graphics.getHeight()/PPM);
+        camera.position.set(Gdx.graphics.getWidth()/2f,Gdx.graphics.getHeight()/2f,0f);
+
+        dDebugRenderer = new Box2DDebugRenderer();
+
+        world = new World(new Vector2(0,-9.8f),true);
+        player = new Player(world,"14668.png",400, 300);//TODO BILD
+        ground = new TestGround(world);
     }
-
-
 
     //this is like the create() method
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(new GestureDetector (this));
-
-        //textureAtlas contains all pictures and is in assets folder
-        //14668 is the name of the first picture
-        textureAtlas = new TextureAtlas(Gdx.files.internal("textureAtlas.pack"));
-        sprite=textureAtlas.createSprite("14668");
-
-        player = new Player(sprite,20,20);
     }
+
 
 
 
     @Override
     public void render(float delta) {
-        //before render clear display
+        player.updatePlayer();
+
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 
         mainClass.getSpriteBatch().begin();
-        player.draw(mainClass.getSpriteBatch());
+        mainClass.getSpriteBatch().draw(player,player.getX()-player.getWidth()/2f,
+                player.getY() - player.getHeight()/2f);
+
+
+        mainClass.getSpriteBatch().draw(ground,0,0);
         mainClass.getSpriteBatch().end();
 
 
+        dDebugRenderer.render(world,camera.combined);
+
+        world.step(Gdx.graphics.getDeltaTime(),6,2);
+
+
+        ground = new TestGround(world);
+
     }
+
+
+
     @Override
     public void resize(int width, int height) {
 
@@ -90,18 +112,20 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     //methods of gesture interface
     @Override
     public boolean fling(float velocityX, float velocityY, int button) {
-        if (velocityX > 0){
-            //move right
-            //player.translateX(80);
-            player.moveRight(80);
+        if(Math.abs(velocityX)>Math.abs(velocityY)){
+            if(velocityX>0){
+                player.getBody().applyLinearImpulse(new Vector2(6,0),player.getBody().getWorldCenter(),true);
+            }else{
+                player.getBody().applyLinearImpulse(new Vector2(-6,0),player.getBody().getWorldCenter(),true);
+            }
+        }else{
+            if(velocityY>0){
 
+            }else{
+                player.getBody().applyLinearImpulse(new Vector2(0,6f),player.getBody().getWorldCenter(),true);
+            }
+        }
 
-        }
-        if (velocityX <0){
-            //move left
-            //player.translateX(-80);
-            player.moveLeft(80);
-        }
 
         return true;
     }
