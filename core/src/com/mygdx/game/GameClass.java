@@ -29,33 +29,30 @@ import Fighter.TestGround;
 public class GameClass implements Screen, GestureDetector.GestureListener {
     private MainClass mainClass;
     private Player player;
-    private World world;
-    private TestGround ground;
-    private OrthographicCamera camera;
-    private Box2DDebugRenderer dDebugRenderer;
-    private int PPM = 100; //TODO auslagern
+    private TextureAtlas atlas;
+
 
     private Stage gameStage;
     private Table movementButtonsTable;
     private Button buttonLeft, buttonRight;
 
-    private boolean moveRight, moveLeft; //TODO evtl auslagern in Player?
 
+
+
+
+    //TODO evtl auslagern in Player?
+    ////////////////////////////////////////////////////////////////////////
+    private static boolean moveRight = false;
+    private static boolean moveLeft = false;
+    private static boolean jump = false;
+    private boolean standing = true;
+   //////////////////////////////////////////////////////////////////
 
     // we need the MainClass Objekt to access the SpriteBatch
     public GameClass(MainClass mainClass){
         this.mainClass = mainClass;
-        //Gdx.input.setInputProcessor(new GestureDetector (this));
-
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false,Gdx.graphics.getWidth()/PPM,Gdx.graphics.getHeight()/PPM);
-        camera.position.set(Gdx.graphics.getWidth()/2f,Gdx.graphics.getHeight()/2f,0f);
-
-        dDebugRenderer = new Box2DDebugRenderer();
-
-        world = new World(new Vector2(0,-9.8f),true);
-        player = new Player(world,"14668.png",400, 300);//TODO BILD
-        ground = new TestGround(world);
+        atlas = new TextureAtlas(Gdx.files.internal("moves.pack"));
+        player = new Player(atlas,20,20);
     }
 
     //this is like the create() method
@@ -65,10 +62,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         setup();
     }
 
-    private void setup()
-    {
-        moveRight = false;
-        moveLeft = false;
+    private void setup() {
 
         gameStage = new Stage();
         Gdx.input.setInputProcessor(gameStage);
@@ -110,6 +104,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             {
                 Gdx.app.log("right", "true");
                 moveRight = true;
+                standing = false;
             }
 
             @Override
@@ -117,6 +112,12 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             {
                 Gdx.app.log("right", "false");
                 moveRight = false;
+
+
+                if(moveLeft == false){
+                    standing=true;
+                }
+
             }
         });
 
@@ -126,6 +127,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             {
                 Gdx.app.log("left", "true");
                 moveLeft = true;
+                standing = false;
             }
 
             @Override
@@ -133,6 +135,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             {
                 Gdx.app.log("left", "false");
                 moveLeft = false;
+                if(moveRight == false){
+                    standing=true;
+                }
             }
         });
 
@@ -143,30 +148,37 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
     @Override
     public void render(float delta) {
-        player.updatePlayer();
-
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        player.updatePlayer(delta);
+
+
+        //TODO switch wohl sauberer
+        if(moveRight){
+            player.moveRight();
+            player.setState = Player.PlayerState.MOVING;
+        }
+
+        if (moveLeft){
+            player.moveLeft();
+            player.setState= Player.PlayerState.MOVING;
+        }
+
+        if(standing){
+            player.setState = Player.PlayerState.STANDING;
+        }
+
 
         mainClass.getSpriteBatch().begin();
-        mainClass.getSpriteBatch().draw(player,player.getX()-player.getWidth()/2f,
-                player.getY() - player.getHeight()/2f);
-
-
-        mainClass.getSpriteBatch().draw(ground,0,0);
+        mainClass.getSpriteBatch().draw(player,player.getX(),player.getY());
         mainClass.getSpriteBatch().end();
 
-
-        dDebugRenderer.render(world,camera.combined);
 
         gameStage.act(delta);
         gameStage.draw();
 
-        world.step(Gdx.graphics.getDeltaTime(),6,2);
 
-
-        ground = new TestGround(world);
 
     }
 
@@ -200,24 +212,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
     //methods of gesture interface
     @Override
-    public boolean fling(float velocityX, float velocityY, int button) {
-        if(Math.abs(velocityX)>Math.abs(velocityY)){
-            if(velocityX>0){
-                player.getBody().applyLinearImpulse(new Vector2(6,0),player.getBody().getWorldCenter(),true);
-            }else{
-                player.getBody().applyLinearImpulse(new Vector2(-6,0),player.getBody().getWorldCenter(),true);
-            }
-        }else{
-            if(velocityY>0){
-
-            }else{
-                player.getBody().applyLinearImpulse(new Vector2(0,6f),player.getBody().getWorldCenter(),true);
-            }
-        }
-
-
-        return true;
-    }
+    public boolean fling(float velocityX, float velocityY, int button) {return false; }
 
     @Override
     public boolean touchDown(float x, float y, int pointer, int button) {

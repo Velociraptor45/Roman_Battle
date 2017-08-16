@@ -1,16 +1,9 @@
 package Fighter;
-
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 
 
 /**
@@ -20,43 +13,115 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class Player extends Sprite {
 
-    private World world;
-    private Body body;
-    private int PPM= 100;
+    public enum PlayerState{STANDING,MOVING,JUMPING}
+    public PlayerState setState = PlayerState.STANDING;
+
+    private TextureRegion facingRight;
+    private TextureRegion facingLeft;
+    private TextureRegion facingDirection;
+
+    private Animation <TextureRegion> runAnimation;
+    private Animation <TextureRegion> jump;
+    private TextureAtlas atlas;
+
+    public PlayerState currentState;
+    public PlayerState previousState;
+    private float stateTimer ;
 
 
-    public Player(World world, String name, float x, float y ){
-        super(new Texture(name));
-        this.world = world;
-        setPosition(x - getWidth()/2f ,y - getHeight() / 2f);
-        createBody();
+    public Player(TextureAtlas atlas, float xPos, float yPos ){
+        this.atlas = atlas;
+        currentState = PlayerState.STANDING;
+        previousState = PlayerState.STANDING;
+        stateTimer = 0f;
+
+        //init animations
+        //get Textureregion for animation run
+        Array<TextureRegion> frames = new Array<TextureRegion>();
+        for (int i=0; i<11; i++){
+            frames.add(new TextureRegion(atlas.findRegion("run",i)));
+        }
+
+        runAnimation = new Animation(1f/10,frames);
+        frames.clear();
+
+
+        //get images for jumpanimation
+        for (int i=0;i<11; i++) {
+            frames.add(new TextureRegion(atlas.findRegion("jump", i)));
+        }
+
+        jump = new Animation(1f/10,frames);
+        //get run animation frames
+        // runAnimation =new Animation<TextureRegion>(1f/10f,atlas.findRegions("run"));
+
+        //get jump animation frames
+        // jump = new Animation<TextureRegion>(1f/10f,atlas.findRegions("jump"));
+
+        //picture in TextureAtlas at index 0
+        facingRight = new TextureRegion(atlas.findRegion("run",0));
+        facingLeft = new TextureRegion(atlas.findRegion("run",0));
+        facingLeft.flip(true,false);
+
+        facingDirection = facingLeft;
+        setPosition(xPos,yPos);
+        setRegion(facingLeft);
+
     }
 
-    private void createBody(){
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(getX()/PPM, getY()/PPM);
-        body = world.createBody(bodyDef);
 
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(getWidth()/2f /PPM, getHeight()/2f /PPM);//TODO klammern
 
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density=0;
-        fixtureDef.friction=0.7f;
+    public void updatePlayer(float delta){
+        setRegion(getFrame(delta));
 
-        Fixture fixture = body.createFixture(fixtureDef);
-        shape.dispose();
     }
 
-    public void updatePlayer(){
-        this.setPosition(body.getPosition().x*PPM, body.getPosition().y*PPM);
+    public TextureRegion getFrame(float delta){
+        currentState = setState;
+        TextureRegion region ;
+
+        switch (currentState){
+            case MOVING:
+                region = new TextureRegion(runAnimation.getKeyFrame(stateTimer,true));
+                break;
+            case STANDING:
+                region = facingDirection;
+                break;
+            case JUMPING:
+                region = new TextureRegion(jump.getKeyFrame(stateTimer,true));
+                break;
+            default:
+                region = facingDirection;
+                break;
+        }
+
+        stateTimer = currentState == previousState? stateTimer + delta :0;//TODO !!!!!!!!!!!!!!
+        previousState = currentState;
+        return region;
     }
 
-    public Body getBody(){
-        return body;
+
+
+    public void moveRight(){
+        setPosition(getX()+5,getY());
+        facingDirection= facingLeft;
+
     }
+
+    public void moveLeft(){
+        setPosition(getX()-5,getY());
+        facingDirection = facingRight;
+    }
+
+    public void jump(){
+        setPosition(getX(),getY()+20);
+    }
+
+    public void duck(){
+        //TODO
+    }
+
+
 
 
 
