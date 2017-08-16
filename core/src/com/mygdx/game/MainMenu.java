@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -37,7 +38,7 @@ public class MainMenu implements Screen ,InputProcessor {
     private MainClass mainClass;
 
     Stage menuStage;
-    Table menuTable;
+    Table menuStartButtonTable, menuTopButtonsTable;
 
     TextureAtlas menuStartButtonAtlas, menuTutorialButtonAtlas, menuSettingsButtonAtlas;
     Skin menuStartButtonSkin, menuTutorialButtonSkin, menuSettingsButtonSkin;
@@ -66,18 +67,22 @@ public class MainMenu implements Screen ,InputProcessor {
         menuStage = new Stage();
         Gdx.input.setInputProcessor(menuStage);
 
-        menuTable = new Table();
-        menuTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        menuStartButtonTable = new Table();
+        menuTopButtonsTable = new Table();
+        menuStartButtonTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        menuTopButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 
         setupTutorialButton();
         setupSettingsButton();
-        menuTable.row();
         setupStartButton();
 
+        menuTopButtonsTable.top().left();
 
-        //menuTable.debug();
-        menuStage.addActor(menuTable);
+        menuStartButtonTable.debug();
+        menuTopButtonsTable.debug();
+        menuStage.addActor(menuStartButtonTable);
+        menuStage.addActor(menuTopButtonsTable);
     }
 
     private void setupStartButton()
@@ -102,7 +107,7 @@ public class MainMenu implements Screen ,InputProcessor {
             }
         });
 
-        menuTable.add(menuStartButton);
+        menuStartButtonTable.add(menuStartButton);
     }
 
     private void setupTutorialButton()
@@ -123,11 +128,11 @@ public class MainMenu implements Screen ,InputProcessor {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                //TODO set Screen for Tutorial
+                //TODO set Screen for Setting
             }
         });
 
-        menuTable.add(menuTutorialButton);
+        menuTopButtonsTable.add(menuTutorialButton);
     }
 
     private void setupSettingsButton()
@@ -146,11 +151,11 @@ public class MainMenu implements Screen ,InputProcessor {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                //TODO set Screen for Tutorial
+                //TODO set screen for Setting
             }
         });
 
-        menuTable.add(menuSettingsButton);
+        menuTopButtonsTable.add(menuSettingsButton);
     }
 
     @Override

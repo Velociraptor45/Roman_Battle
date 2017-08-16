@@ -3,10 +3,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import Fighter.Player;
 import Fighter.TestGround;
@@ -27,14 +35,17 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     private Box2DDebugRenderer dDebugRenderer;
     private int PPM = 100; //TODO auslagern
 
+    private Stage gameStage;
+    private Table movementButtonsTable;
+    private Button buttonLeft, buttonRight;
 
-
+    private boolean moveRight, moveLeft; //TODO evtl auslagern in Player?
 
 
     // we need the MainClass Objekt to access the SpriteBatch
     public GameClass(MainClass mainClass){
         this.mainClass = mainClass;
-        Gdx.input.setInputProcessor(new GestureDetector (this));
+        //Gdx.input.setInputProcessor(new GestureDetector (this));
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false,Gdx.graphics.getWidth()/PPM,Gdx.graphics.getHeight()/PPM);
@@ -49,10 +60,85 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
     //this is like the create() method
     @Override
-    public void show() {
+    public void show()
+    {
+        setup();
     }
 
+    private void setup()
+    {
+        moveRight = false;
+        moveLeft = false;
 
+        gameStage = new Stage();
+        Gdx.input.setInputProcessor(gameStage);
+
+        movementButtonsTable = new Table();
+        movementButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+
+        setupButtons();
+
+        movementButtonsTable.bottom().left();
+
+        movementButtonsTable.debug();
+        gameStage.addActor(movementButtonsTable);
+    }
+
+    private void setupButtons()
+    {
+        TextureAtlas rightButtonAtlas = new TextureAtlas("ui/game/buttons/arrowRight.pack");
+        TextureAtlas leftButtonAtlas = new TextureAtlas("ui/game/buttons/arrowLeft.pack");
+
+        Skin rightButtonSkin = new Skin(rightButtonAtlas);
+        Skin leftButtonSkin = new Skin(leftButtonAtlas);
+
+        Button.ButtonStyle rightStyle = new Button.ButtonStyle();
+        Button.ButtonStyle leftStyle = new Button.ButtonStyle();
+
+        rightStyle.up = rightButtonSkin.getDrawable("arrowRight.up");
+        rightStyle.down = rightButtonSkin.getDrawable("arrowRight.up");
+        leftStyle.up = leftButtonSkin.getDrawable("arrowRight.up");
+        leftStyle.down = leftButtonSkin.getDrawable("arrowRight.up");
+
+        buttonRight = new Button(rightStyle);
+        buttonLeft = new Button(leftStyle);
+
+        buttonRight.addListener(new ClickListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
+            {
+                Gdx.app.log("right", "true");
+                moveRight = true;
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor fromActor)
+            {
+                Gdx.app.log("right", "false");
+                moveRight = false;
+            }
+        });
+
+        buttonLeft.addListener(new ClickListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
+            {
+                Gdx.app.log("left", "true");
+                moveLeft = true;
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor fromActor)
+            {
+                Gdx.app.log("left", "false");
+                moveLeft = false;
+            }
+        });
+
+        movementButtonsTable.add(buttonLeft);
+        movementButtonsTable.add(buttonRight);
+    }
 
 
     @Override
@@ -73,6 +159,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
 
         dDebugRenderer.render(world,camera.combined);
+
+        gameStage.act(delta);
+        gameStage.draw();
 
         world.step(Gdx.graphics.getDeltaTime(),6,2);
 
