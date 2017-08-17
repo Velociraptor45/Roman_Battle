@@ -1,8 +1,10 @@
 package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
@@ -14,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import Fighter.Player;
@@ -33,8 +36,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
 
     private Stage gameStage;
-    private Table movementButtonsTable;
-    private Button buttonLeft, buttonRight;
+    private Table movementButtonsTable, jbaButtonsTable; //jba = jump block attack
+    private Button buttonLeft, buttonRight, buttonUp, buttonDown;
+    private TextButton buttonAttack, buttonBlock, buttonJump;
 
 
 
@@ -68,35 +72,78 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         Gdx.input.setInputProcessor(gameStage);
 
         movementButtonsTable = new Table();
+        jbaButtonsTable = new Table();
         movementButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        jbaButtonsTable.setBounds(0, 0 , Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
+        setupLeftButton();
+        setupUpButton();
+        setupRightButton();
+        movementButtonsTable.row();
+        setupDownButton();
 
-        setupButtons();
+        setupJumpButton();
+        setupBlockButton();
+        jbaButtonsTable.row();
+        setupAttackButton();
 
         movementButtonsTable.bottom().left();
+        jbaButtonsTable.bottom().right();
 
         movementButtonsTable.debug();
+        jbaButtonsTable.debug();
         gameStage.addActor(movementButtonsTable);
+        gameStage.addActor(jbaButtonsTable);
     }
 
-    private void setupButtons()
+    private void setupLeftButton()
     {
-        TextureAtlas rightButtonAtlas = new TextureAtlas("ui/game/buttons/arrowRight.pack");
         TextureAtlas leftButtonAtlas = new TextureAtlas("ui/game/buttons/arrowLeft.pack");
 
-        Skin rightButtonSkin = new Skin(rightButtonAtlas);
         Skin leftButtonSkin = new Skin(leftButtonAtlas);
 
-        Button.ButtonStyle rightStyle = new Button.ButtonStyle();
         Button.ButtonStyle leftStyle = new Button.ButtonStyle();
 
-        rightStyle.up = rightButtonSkin.getDrawable("arrowRight.up");
-        rightStyle.down = rightButtonSkin.getDrawable("arrowRight.up");
         leftStyle.up = leftButtonSkin.getDrawable("arrowRight.up");
         leftStyle.down = leftButtonSkin.getDrawable("arrowRight.up");
 
-        buttonRight = new Button(rightStyle);
         buttonLeft = new Button(leftStyle);
+
+        buttonLeft.addListener(new ClickListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
+            {
+                Gdx.app.log("left", "true");
+                moveLeft = true;
+                standing = false;
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor fromActor)
+            {
+                Gdx.app.log("left", "false");
+                moveLeft = false;
+                if(!moveRight){
+                    standing=true;
+                }
+            }
+        });
+
+        movementButtonsTable.add(buttonLeft);
+    }
+
+    private void setupRightButton()
+    {
+        TextureAtlas rightButtonAtlas = new TextureAtlas("ui/game/buttons/arrowRight.pack");
+
+        Skin rightButtonSkin = new Skin(rightButtonAtlas);
+
+        Button.ButtonStyle rightStyle = new Button.ButtonStyle();
+
+        rightStyle.up = rightButtonSkin.getDrawable("arrowRight.up");
+        rightStyle.down = rightButtonSkin.getDrawable("arrowRight.up");
+
+        buttonRight = new Button(rightStyle);
 
         buttonRight.addListener(new ClickListener() {
             @Override
@@ -114,37 +161,154 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
                 moveRight = false;
 
 
-                if(moveLeft == false){
+                if(!moveLeft){
                     standing=true;
                 }
 
             }
         });
 
-        buttonLeft.addListener(new ClickListener() {
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
-            {
-                Gdx.app.log("left", "true");
-                moveLeft = true;
-                standing = false;
-            }
-
-            @Override
-            public void exit(InputEvent event, float x, float y, int pointer, Actor fromActor)
-            {
-                Gdx.app.log("left", "false");
-                moveLeft = false;
-                if(moveRight == false){
-                    standing=true;
-                }
-            }
-        });
-
-        movementButtonsTable.add(buttonLeft);
         movementButtonsTable.add(buttonRight);
     }
 
+    private void setupUpButton()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/arrowUp.pack");
+
+        Skin skin = new Skin(atlas);
+
+        Button.ButtonStyle style = new Button.ButtonStyle();
+
+        style.up = skin.getDrawable("arrowUp.up");
+        style.down = skin.getDrawable("arrowUp.up");
+
+        buttonUp = new Button(style);
+        buttonUp.addListener(new ClickListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
+            {
+                //TODO bool Variable für Angriff nach oben setzen
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor)
+            {
+                //TODO bool Variable für Angriff nach oben wieder zurücksetzen
+            }
+        });
+
+        movementButtonsTable.add(buttonUp);
+    }
+
+    private void setupDownButton()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/arrowDown.pack");
+
+        Skin skin = new Skin(atlas);
+
+        Button.ButtonStyle style = new Button.ButtonStyle();
+
+        style.up = skin.getDrawable("arrowDown.up");
+        style.down = skin.getDrawable("arrowDown.up");
+
+        buttonDown = new Button(style);
+        buttonDown.addListener(new ClickListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
+            {
+                //TODO bool Variblen für ducken und Angriff nach unten setzen
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor)
+            {
+                //TODO bool Varibalen für ducken und Angriff nach unten wieder zurücksetzen
+            }
+        });
+
+        movementButtonsTable.add(buttonDown);
+    }
+
+    private void setupAttackButton()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/jba.pack"); //jba = jump block attack
+
+        Skin skin = new Skin(atlas);
+
+        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+
+        style.up = skin.getDrawable("jba.up");
+        style.down = skin.getDrawable("jba.up");
+        style.font = new BitmapFont();
+        style.fontColor = Color.BLACK;
+        style.pressedOffsetX = 1;
+        style.pressedOffsetY = -1;
+
+        buttonAttack = new TextButton("A", style);
+        buttonAttack.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y)
+            {
+                //TODO Angriff auslösen, aber vorher prüfen, ob nach oben/unten gleichzeitig gedrückt wird
+            }
+        });
+
+        jbaButtonsTable.add(buttonAttack);
+    }
+
+    private void setupBlockButton()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/jba.pack"); //jba = jump block attack
+
+        Skin skin = new Skin(atlas);
+
+        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+
+        style.up = skin.getDrawable("jba.up");
+        style.down = skin.getDrawable("jba.up");
+        style.font = new BitmapFont();
+        style.fontColor = Color.BLACK;
+        style.pressedOffsetX = 1;
+        style.pressedOffsetY = -1;
+
+        buttonBlock = new TextButton("B", style);
+        buttonBlock.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y)
+            {
+                //TODO Block auslösen
+            }
+        });
+
+        jbaButtonsTable.add(buttonBlock);
+    }
+
+    private void setupJumpButton()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/jba.pack"); //jba = jump block attack
+
+        Skin skin = new Skin(atlas);
+
+        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+
+        style.up = skin.getDrawable("jba.up");
+        style.down = skin.getDrawable("jba.up");
+        style.font = new BitmapFont();
+        style.fontColor = Color.BLACK;
+        style.pressedOffsetX = 1;
+        style.pressedOffsetY = -1;
+
+        buttonJump = new TextButton("J", style);
+        buttonJump.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y)
+            {
+                //TODO Sprung auslösen
+            }
+        });
+
+        jbaButtonsTable.add(buttonJump);
+    }
 
     @Override
     public void render(float delta) {

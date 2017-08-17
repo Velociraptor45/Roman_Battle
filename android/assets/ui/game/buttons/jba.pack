@@ -1,0 +1,12 @@
+
+jba.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+jba.up
+  rotate: false
+  xy: 1, 1
+  size: 72, 72
+  orig: 72, 72
+  offset: 0, 0
+  index: -1
