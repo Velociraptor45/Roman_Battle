@@ -1,8 +1,9 @@
 package Fighter;
 
-/**
- * Created by david on 12.08.2017.
- */
+import Constants.GameValues;
 
-public class Fighter {
+
+public class Fighter
+{
+    protected int HP = GameValues.FIGHTER_HEALTH;
 }

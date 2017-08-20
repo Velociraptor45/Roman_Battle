@@ -1,4 +1,5 @@
 package com.mygdx.game;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import Constants.GameValues;
 import Fighter.Player;
 import Fighter.TestGround;
 
@@ -41,10 +43,6 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     private TextButton buttonAttack, buttonBlock, buttonJump;
 
 
-
-
-
-    //TODO evtl auslagern in Player?
     ////////////////////////////////////////////////////////////////////////
     private static boolean moveRight = false;
     private static boolean moveLeft = false;
@@ -56,7 +54,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     public GameClass(MainClass mainClass){
         this.mainClass = mainClass;
         atlas = new TextureAtlas(Gdx.files.internal("moves.pack"));
-        player = new Player(atlas,20,20);
+        player = new Player(atlas,20, GameValues.FIGHTER_ORIGINAL_HEIGHT);
     }
 
     //this is like the create() method
@@ -304,6 +302,10 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             public void clicked(InputEvent event, float x, float y)
             {
                 //TODO Sprung auslösen
+                if(player.getY() == GameValues.FIGHTER_ORIGINAL_HEIGHT)
+                {
+                    jump = true;
+                }
             }
         });
 
@@ -331,6 +333,15 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
         if(standing){
             player.setState = Player.PlayerState.STANDING;
+        }
+
+        if(jump)
+        {
+            jump = player.jump();
+        }
+        else if(player.getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
+        {
+            player.fall();
         }
 
 

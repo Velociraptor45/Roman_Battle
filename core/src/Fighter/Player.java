@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
+import Constants.GameValues;
+
 
 /**
  * Created by david on 12.08.2017.
@@ -104,7 +106,7 @@ public class Player extends Sprite {
 
     public void moveRight(){
         setPosition(getX()+5,getY());
-        facingDirection= facingLeft;
+        facingDirection = facingLeft;
 
     }
 
@@ -113,8 +115,21 @@ public class Player extends Sprite {
         facingDirection = facingRight;
     }
 
-    public void jump(){
-        setPosition(getX(),getY()+20);
+    public boolean jump(){
+        setPosition(getX(),getY() + GameValues.FIGHTER_JUMP_HEIGHT);
+        if(GameValues.FIGHTER_ORIGINAL_HEIGHT + GameValues.FIGHTER_MAX_JUMP_HEIGHT > getY())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void fall()
+    {
+        setPosition(getX(),getY() - GameValues.FIGHTER_JUMP_HEIGHT);
     }
 
     public void duck(){
