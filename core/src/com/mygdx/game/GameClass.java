@@ -74,8 +74,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         movementButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         jbaButtonsTable.setBounds(0, 0 , Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        setupLeftButton();
         setupUpButton();
+        movementButtonsTable.row();
+        setupLeftButton();
         setupRightButton();
         movementButtonsTable.row();
         setupDownButton();
@@ -302,7 +303,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             public void clicked(InputEvent event, float x, float y)
             {
                 //TODO Sprung auslösen
-                if(player.getY() == GameValues.FIGHTER_ORIGINAL_HEIGHT)
+                if(player.getY() <= GameValues.FIGHTER_ORIGINAL_HEIGHT)
                 {
                     jump = true;
                 }
@@ -320,30 +321,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         player.updatePlayer(delta);
 
 
-        //TODO switch wohl sauberer
-        if(moveRight){
-            player.moveRight();
-            player.setState = Player.PlayerState.MOVING;
-        }
-
-        if (moveLeft){
-            player.moveLeft();
-            player.setState= Player.PlayerState.MOVING;
-        }
-
-        if(standing){
-            player.setState = Player.PlayerState.STANDING;
-        }
-
-        if(jump)
-        {
-            jump = player.jump();
-        }
-        else if(player.getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
-        {
-            player.fall();
-        }
-
+        switchPlayerState();
 
         mainClass.getSpriteBatch().begin();
         mainClass.getSpriteBatch().draw(player,player.getX(),player.getY());
@@ -352,9 +330,33 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
         gameStage.act(delta);
         gameStage.draw();
+    }
 
+    private void switchPlayerState()
+    {
+        //TODO switch wohl sauberer
+        if(moveRight){
+            player.moveRight();
+            player.setState(Player.PlayerState.MOVING);
+        }
+        else if (moveLeft){
+            player.moveLeft();
+            player.setState(Player.PlayerState.MOVING);
+        }
+        else if(standing){
+            player.setState(Player.PlayerState.STANDING);
+        }
 
-
+        if(jump)
+        {
+            player.setState(Player.PlayerState.JUMPING);
+            jump = player.jump();
+        }
+        else if(player.getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
+        {
+            player.setState(Player.PlayerState.JUMPING);
+            player.fall();
+        }
     }
 
 

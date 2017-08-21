@@ -1,8 +1,10 @@
 package Fighter;
+
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.physics.box2d.joints.GearJoint;
 import com.badlogic.gdx.utils.Array;
 
 import Constants.GameValues;
@@ -15,8 +17,8 @@ import Constants.GameValues;
 
 public class Player extends Sprite {
 
-    public enum PlayerState{STANDING,MOVING,JUMPING}
-    public PlayerState setState = PlayerState.STANDING;
+    public enum PlayerState{STANDING, MOVING, JUMPING}
+    private PlayerState setState = PlayerState.STANDING;
 
     private TextureRegion facingRight;
     private TextureRegion facingLeft;
@@ -44,7 +46,7 @@ public class Player extends Sprite {
             frames.add(new TextureRegion(atlas.findRegion("run",i)));
         }
 
-        runAnimation = new Animation(1f/10,frames);
+        runAnimation = new Animation(1f/20,frames);
         frames.clear();
 
 
@@ -75,7 +77,11 @@ public class Player extends Sprite {
 
     public void updatePlayer(float delta){
         setRegion(getFrame(delta));
+    }
 
+    public void setState(PlayerState state)
+    {
+        setState = state;
     }
 
     public TextureRegion getFrame(float delta){
@@ -105,31 +111,44 @@ public class Player extends Sprite {
 
 
     public void moveRight(){
-        setPosition(getX()+5,getY());
+        setPosition(getX() + GameValues.FIGHTER_MOVING_SPEED,getY());
         facingDirection = facingLeft;
 
     }
 
     public void moveLeft(){
-        setPosition(getX()-5,getY());
+        setPosition(getX() - GameValues.FIGHTER_MOVING_SPEED,getY());
         facingDirection = facingRight;
     }
 
-    public boolean jump(){
-        setPosition(getX(),getY() + GameValues.FIGHTER_JUMP_HEIGHT);
-        if(GameValues.FIGHTER_ORIGINAL_HEIGHT + GameValues.FIGHTER_MAX_JUMP_HEIGHT > getY())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+    public boolean jump()
+    {
+        setPosition(getX(), getY() + calcJumpFallSpeed(getY() - GameValues.FIGHTER_ORIGINAL_HEIGHT));
+        return (GameValues.FIGHTER_ORIGINAL_HEIGHT + GameValues.FIGHTER_MAX_JUMP_HEIGHT > getY());
     }
 
     public void fall()
     {
-        setPosition(getX(),getY() - GameValues.FIGHTER_JUMP_HEIGHT);
+        setPosition(getX(),getY() - calcJumpFallSpeed(getY() - GameValues.FIGHTER_ORIGINAL_HEIGHT));
+        if(getY() < GameValues.FIGHTER_ORIGINAL_HEIGHT)
+        {
+            setPosition(getX(), GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        }
+    }
+
+    private float calcJumpFallSpeed(double y)
+    {
+        float x;
+
+        double radicand = -1 * y + GameValues.FIGHTER_MAX_JUMP_HEIGHT;
+
+        if(radicand < 0)
+        {
+            radicand = Math.abs(radicand);
+        }
+        x = -1 * (float) Math.sqrt(radicand);
+
+        return -2*x;
     }
 
     public void duck(){
