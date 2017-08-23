@@ -9,16 +9,12 @@ import com.badlogic.gdx.utils.Array;
 
 import Constants.GameValues;
 
-
-/**
- * Created by david on 12.08.2017.
- */
-
-
 public class Player extends Sprite {
 
-    public enum PlayerState{STANDING, MOVING, JUMPING}
-    private PlayerState setState = PlayerState.STANDING;
+    public enum PlayerMovementState{STANDING, MOVING, JUMPING}
+    private PlayerMovementState movementState = PlayerMovementState.STANDING;
+    public enum PlayerFightingState {ATTACK, BLOCK, NONE}
+    private PlayerFightingState fightingState = PlayerFightingState.NONE;
 
     private TextureRegion facingRight;
     private TextureRegion facingLeft;
@@ -28,15 +24,15 @@ public class Player extends Sprite {
     private Animation <TextureRegion> jump;
     private TextureAtlas atlas;
 
-    public PlayerState currentState;
-    public PlayerState previousState;
+    public PlayerMovementState currentState;
+    public PlayerMovementState previousState;
     private float stateTimer ;
 
 
     public Player(TextureAtlas atlas, float xPos, float yPos ){
         this.atlas = atlas;
-        currentState = PlayerState.STANDING;
-        previousState = PlayerState.STANDING;
+        currentState = PlayerMovementState.STANDING;
+        previousState = PlayerMovementState.STANDING;
         stateTimer = 0f;
 
         //init animations
@@ -70,22 +66,19 @@ public class Player extends Sprite {
         facingDirection = facingLeft;
         setPosition(xPos,yPos);
         setRegion(facingLeft);
-
     }
-
-
 
     public void updatePlayer(float delta){
         setRegion(getFrame(delta));
     }
 
-    public void setState(PlayerState state)
+    public void setState(PlayerMovementState state)
     {
-        setState = state;
+        movementState = state;
     }
 
     public TextureRegion getFrame(float delta){
-        currentState = setState;
+        currentState = movementState;
         TextureRegion region ;
 
         switch (currentState){
@@ -153,6 +146,11 @@ public class Player extends Sprite {
 
     public void duck(){
         //TODO
+    }
+
+    public boolean isOnGround()
+    {
+        return getY() == GameValues.FIGHTER_ORIGINAL_HEIGHT;
     }
 
 

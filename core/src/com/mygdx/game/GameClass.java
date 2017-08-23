@@ -1,4 +1,5 @@
 package com.mygdx.game;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -44,10 +45,15 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
 
     ////////////////////////////////////////////////////////////////////////
-    private static boolean moveRight = false;
-    private static boolean moveLeft = false;
-    private static boolean jump = false;
+    private boolean moveRight = false;
+    private boolean moveLeft = false;
+    private boolean jump = false;
     private boolean standing = true;
+    private boolean attackDown = false;
+    private boolean attackUp = true;
+    private boolean duck = false;
+    private boolean attack = false;
+    private boolean block = false;
    //////////////////////////////////////////////////////////////////
 
     // we need the MainClass Objekt to access the SpriteBatch
@@ -186,13 +192,13 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
             {
-                //TODO bool Variable für Angriff nach oben setzen
+                attackUp = true;
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor)
             {
-                //TODO bool Variable für Angriff nach oben wieder zurücksetzen
+                attackUp = true;
             }
         });
 
@@ -215,13 +221,21 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
             {
-                //TODO bool Variblen für ducken und Angriff nach unten setzen
+                if(player.isOnGround())
+                {
+                    duck = true;
+                }
+                else
+                {
+                    attackDown = true;
+                }
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor)
             {
-                //TODO bool Varibalen für ducken und Angriff nach unten wieder zurücksetzen
+                duck = false;
+                attackDown = false;
             }
         });
 
@@ -248,7 +262,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                //TODO Angriff auslösen, aber vorher prüfen, ob nach oben/unten gleichzeitig gedrückt wird
+                attack = true;
             }
         });
 
@@ -275,7 +289,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                //TODO Block auslösen
+                block = true;
             }
         });
 
@@ -302,7 +316,6 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                //TODO Sprung auslösen
                 if(player.getY() <= GameValues.FIGHTER_ORIGINAL_HEIGHT)
                 {
                     jump = true;
@@ -337,24 +350,24 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         //TODO switch wohl sauberer
         if(moveRight){
             player.moveRight();
-            player.setState(Player.PlayerState.MOVING);
+            player.setState(Player.PlayerMovementState.MOVING);
         }
         else if (moveLeft){
             player.moveLeft();
-            player.setState(Player.PlayerState.MOVING);
+            player.setState(Player.PlayerMovementState.MOVING);
         }
         else if(standing){
-            player.setState(Player.PlayerState.STANDING);
+            player.setState(Player.PlayerMovementState.STANDING);
         }
 
         if(jump)
         {
-            player.setState(Player.PlayerState.JUMPING);
+            player.setState(Player.PlayerMovementState.JUMPING);
             jump = player.jump();
         }
         else if(player.getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
         {
-            player.setState(Player.PlayerState.JUMPING);
+            player.setState(Player.PlayerMovementState.JUMPING);
             player.fall();
         }
     }

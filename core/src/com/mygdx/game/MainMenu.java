@@ -37,14 +37,14 @@ public class MainMenu implements Screen ,InputProcessor {
     //do we need to get the spriteBatch
     private MainClass mainClass;
 
-    Stage menuStage;
-    Table menuStartButtonTable, menuTopButtonsTable;
+    private Stage menuStage;
+    private Table menuStartButtonTable, menuTopButtonsTable;
 
-    TextureAtlas menuStartButtonAtlas, menuTutorialButtonAtlas, menuSettingsButtonAtlas;
-    Skin menuStartButtonSkin, menuTutorialButtonSkin, menuSettingsButtonSkin;
+    private TextureAtlas menuStartButtonAtlas, menuTutorialButtonAtlas, menuSettingsButtonAtlas;
+    private Skin menuStartButtonSkin, menuTutorialButtonSkin, menuSettingsButtonSkin;
 
-    TextButton menuStartButton, menuTutorialButton;
-    Button menuSettingsButton;
+    private TextButton menuStartButton, menuTutorialButton;
+    private Button menuSettingsButton;
 
 
    // we need the MainClass Objekt to access the SpriteBatch
