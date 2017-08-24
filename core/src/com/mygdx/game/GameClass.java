@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import Constants.GameValues;
+import Fighter.Fighter;
 import Fighter.Player;
 import Fighter.TestGround;
 
@@ -331,10 +332,11 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        player.updatePlayer(delta);
+        player.update(delta);
 
 
-        switchPlayerState();
+        switchPlayerMovementState();
+        switchPlayerFightingState();
 
         mainClass.getSpriteBatch().begin();
         mainClass.getSpriteBatch().draw(player,player.getX(),player.getY());
@@ -345,29 +347,57 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         gameStage.draw();
     }
 
-    private void switchPlayerState()
+    private void switchPlayerFightingState()
+    {
+        if(attackUp && attack)
+        {
+            player.setFightingState(Player.FighterFightingState.ATTACK);
+        }
+        else if(attackDown && attack)
+        {
+            player.setFightingState(Player.FighterFightingState.ATTACK);
+        }
+        else if(attack)
+        {
+            player.setFightingState(Player.FighterFightingState.ATTACK);
+        }
+        else if(block)
+        {
+            player.setFightingState(Player.FighterFightingState.BLOCK);
+        }
+        else
+        {
+            player.setFightingState(Player.FighterFightingState.NONE);
+        }
+    }
+
+    private void switchPlayerMovementState()
     {
         //TODO switch wohl sauberer
         if(moveRight){
             player.moveRight();
-            player.setState(Player.PlayerMovementState.MOVING);
+            player.setMovementState(Player.FighterMovementState.MOVING);
         }
         else if (moveLeft){
             player.moveLeft();
-            player.setState(Player.PlayerMovementState.MOVING);
+            player.setMovementState(Player.FighterMovementState.MOVING);
         }
         else if(standing){
-            player.setState(Player.PlayerMovementState.STANDING);
+            player.setMovementState(Player.FighterMovementState.STANDING);
+        }
+        else if(attackDown && !attack)
+        {
+            player.setMovementState(Player.FighterMovementState.DUCKING);
         }
 
         if(jump)
         {
-            player.setState(Player.PlayerMovementState.JUMPING);
+            player.setMovementState(Player.FighterMovementState.JUMPING);
             jump = player.jump();
         }
         else if(player.getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
         {
-            player.setState(Player.PlayerMovementState.JUMPING);
+            player.setMovementState(Player.FighterMovementState.JUMPING);
             player.fall();
         }
     }
