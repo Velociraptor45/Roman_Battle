@@ -351,11 +351,11 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     {
         if(attackUp && attack)
         {
-            player.setFightingState(Player.FighterFightingState.ATTACK);
+            player.setFightingState(Player.FighterFightingState.ATTACK_UP);
         }
         else if(attackDown && attack)
         {
-            player.setFightingState(Player.FighterFightingState.ATTACK);
+            player.setFightingState(Player.FighterFightingState.ATTACK_DOWN);
         }
         else if(attack)
         {
@@ -376,11 +376,11 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         //TODO switch wohl sauberer
         if(moveRight){
             player.moveRight();
-            player.setMovementState(Player.FighterMovementState.MOVING);
+            player.setMovementState(Player.FighterMovementState.MOVINGRIGHT);
         }
         else if (moveLeft){
             player.moveLeft();
-            player.setMovementState(Player.FighterMovementState.MOVING);
+            player.setMovementState(Player.FighterMovementState.MOVINGLEFT);
         }
         else if(standing){
             player.setMovementState(Player.FighterMovementState.STANDING);

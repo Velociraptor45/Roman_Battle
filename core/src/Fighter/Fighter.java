@@ -11,10 +11,9 @@ import Constants.GameValues;
 
 public class Fighter extends Sprite
 {
-
-    public enum FighterMovementState{STANDING, MOVING, JUMPING, DUCKING}
+    public enum FighterMovementState{STANDING, MOVINGRIGHT, MOVINGLEFT, JUMPING, DUCKING}
     protected FighterMovementState movementState = FighterMovementState.STANDING;
-    public enum FighterFightingState {ATTACK, BLOCK, NONE}
+    public enum FighterFightingState {ATTACK_UP, ATTACK_DOWN, ATTACK, BLOCK, NONE}
     protected FighterFightingState fightingState = FighterFightingState.NONE;
 
     protected TextureRegion facingRight;
@@ -25,8 +24,8 @@ public class Fighter extends Sprite
     protected Animation <TextureRegion> jump;
     protected TextureAtlas atlas;
 
-    protected FighterMovementState currentState;
-    protected FighterMovementState previousState;
+    protected FighterMovementState currentMovementState;
+    protected FighterMovementState previousMovementState;
     protected float stateTimer;
 
     ////////////////////////////////////////////////////////////
@@ -37,8 +36,8 @@ public class Fighter extends Sprite
     public Fighter (TextureAtlas atlas, float xPos, float yPos)
     {
         this.atlas = atlas;
-        currentState = FighterMovementState.STANDING;
-        previousState = FighterMovementState.STANDING;
+        currentMovementState = FighterMovementState.STANDING;
+        previousMovementState = FighterMovementState.STANDING;
         stateTimer = 0f;
 
         //init animations
@@ -79,6 +78,16 @@ public class Fighter extends Sprite
         movementState = state;
     }
 
+    public FighterMovementState getCurrentMovementState()
+    {
+        return currentMovementState;
+    }
+
+    public FighterFightingState getCurrentFightingState()
+    {
+        return null; //TODO
+    }
+
     public void setFightingState(FighterFightingState state)
     {
         fightingState = state;
@@ -89,11 +98,12 @@ public class Fighter extends Sprite
     }
 
     public TextureRegion getFrame(float delta){
-        currentState = movementState;
+        currentMovementState = movementState;
         TextureRegion region ;
 
-        switch (currentState){
-            case MOVING:
+        switch (currentMovementState){
+            case MOVINGRIGHT:
+            case MOVINGLEFT:
                 region = new TextureRegion(runAnimation.getKeyFrame(stateTimer,true));
                 break;
             case STANDING:
@@ -107,8 +117,8 @@ public class Fighter extends Sprite
                 break;
         }
 
-        stateTimer = currentState == previousState? stateTimer + delta :0;//TODO !!!!!!!!!!!!!!
-        previousState = currentState;
+        stateTimer = currentMovementState == previousMovementState? stateTimer + delta :0;//TODO !!!!!!!!!!!!!!
+        previousMovementState = currentMovementState;
         return region;
     }
 
@@ -157,8 +167,28 @@ public class Fighter extends Sprite
         //TODO
     }
 
+    public void block()
+    {
+
+    }
+
+    public void attackDown()
+    {
+
+    }
+
+    public void attackUp()
+    {
+
+    }
+
     public boolean isOnGround()
     {
         return getY() == GameValues.FIGHTER_ORIGINAL_HEIGHT;
+    }
+
+    public void takeDamage(int damage)
+    {
+        HP -= damage;
     }
 }
