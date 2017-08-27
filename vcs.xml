@@ -6,6 +6,10 @@
           <option name="url" value="https://github.com/Velociraptor45/Roman_Battle" />
           <option name="userName" value="" />
         </UrlAndUserName>
+        <UrlAndUserName>
+          <option name="url" value="https://github.com/Velociraptor45/Roman_Battle.git" />
+          <option name="userName" value="" />
+        </UrlAndUserName>
       </list>
     </option>
     <option name="cloneParentDir" value="C:\Users\AboutWhite\Documents" />
