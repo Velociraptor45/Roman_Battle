@@ -1,5 +1,6 @@
 package Fighter;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -71,6 +72,7 @@ public class Fighter extends Sprite
         facingDirection = facingLeft;
         setPosition(xPos, yPos);
         setRegion(facingLeft);
+        setRegionWidth(30);
     }
 
     public void setMovementState(FighterMovementState state)
@@ -80,7 +82,7 @@ public class Fighter extends Sprite
 
     public FighterMovementState getCurrentMovementState()
     {
-        return currentMovementState;
+        return movementState;
     }
 
     public FighterFightingState getCurrentFightingState()
@@ -122,17 +124,25 @@ public class Fighter extends Sprite
         return region;
     }
 
-    public void moveRight(){
-        setPosition(getX() + GameValues.FIGHTER_MOVING_SPEED,getY());
-        facingDirection = facingLeft;
-
+    public void moveRight(int speed)
+    {
+        if(getX() + getWidth() + speed <= Gdx.graphics.getWidth()) //TODO getWidth() austauschen
+        {
+            setPosition(getX() + speed, getY());
+        }
     }
 
-    public void moveLeft(){
-        setPosition(getX() - GameValues.FIGHTER_MOVING_SPEED,getY());
-        facingDirection = facingRight;
+    public void moveLeft(int speed)
+    {
+        if(getX() - speed >= 0)
+        {
+            setPosition(getX() - speed, getY());
+        }
     }
 
+    /*
+        returns true until maximum jump height is reached
+     */
     public boolean jump()
     {
         setPosition(getX(), getY() + calcJumpFallSpeed(getY() - GameValues.FIGHTER_ORIGINAL_HEIGHT));
@@ -190,5 +200,17 @@ public class Fighter extends Sprite
     public void takeDamage(int damage)
     {
         HP -= damage;
+    }
+
+    public void updateFacingDirection(Fighter fighter)
+    {
+        if(getX() < fighter.getX())
+        {
+            facingDirection = facingRight;
+        }
+        else
+        {
+            facingDirection = facingLeft;
+        }
     }
 }

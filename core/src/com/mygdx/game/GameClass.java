@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import Constants.GameValues;
 import Fighter.Fighter;
 import Fighter.Player;
+import Fighter.AI;
 import Fighter.TestGround;
 
 /**
@@ -36,6 +37,7 @@ import Fighter.TestGround;
 public class GameClass implements Screen, GestureDetector.GestureListener {
     private MainClass mainClass;
     private Player player;
+    private AI ai;
     private TextureAtlas atlas;
 
 
@@ -43,7 +45,6 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     private Table movementButtonsTable, jbaButtonsTable; //jba = jump block attack
     private Button buttonLeft, buttonRight, buttonUp, buttonDown;
     private TextButton buttonAttack, buttonBlock, buttonJump;
-
 
     ////////////////////////////////////////////////////////////////////////
     private boolean moveRight = false;
@@ -61,7 +62,11 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     public GameClass(MainClass mainClass){
         this.mainClass = mainClass;
         atlas = new TextureAtlas(Gdx.files.internal("moves.pack"));
-        player = new Player(atlas,20, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        player = new Player(atlas,700, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        ai = new AI(0, atlas, 20, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+
+        player.updateFacingDirection(ai);
+        ai.updateFacingDirection(player);
     }
 
     //this is like the create() method
@@ -332,7 +337,14 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        player.updateFacingDirection(ai);
+        ai.updateFacingDirection(player);
+
         player.update(delta);
+        ai.update(delta);
+
+
+        //ai.act(player, delta);
 
 
         switchPlayerMovementState();
@@ -340,6 +352,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
         mainClass.getSpriteBatch().begin();
         mainClass.getSpriteBatch().draw(player,player.getX(),player.getY());
+        mainClass.getSpriteBatch().draw(ai, ai.getX(), ai.getY());
         mainClass.getSpriteBatch().end();
 
 
@@ -375,11 +388,11 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     {
         //TODO switch wohl sauberer
         if(moveRight){
-            player.moveRight();
+            player.moveRight(GameValues.PLAYER_MOVING_SPEED);
             player.setMovementState(Player.FighterMovementState.MOVINGRIGHT);
         }
         else if (moveLeft){
-            player.moveLeft();
+            player.moveLeft(GameValues.PLAYER_MOVING_SPEED);
             player.setMovementState(Player.FighterMovementState.MOVINGLEFT);
         }
         else if(standing){
