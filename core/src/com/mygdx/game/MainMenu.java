@@ -33,15 +33,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 // multitouch würde man aber noch etwas anders verarbeiten mit multiplex oder so hab das noch nicht so genau gelesen
 
 
-public class MainMenu implements Screen ,InputProcessor {
+public class MainMenu implements Screen, InputProcessor {
     //do we need to get the spriteBatch
     private MainClass mainClass;
 
     private Stage menuStage;
     private Table menuStartButtonTable, menuTopButtonsTable;
-
-    private TextureAtlas menuStartButtonAtlas, menuTutorialButtonAtlas, menuSettingsButtonAtlas;
-    private Skin menuStartButtonSkin, menuTutorialButtonSkin, menuSettingsButtonSkin;
 
     private TextButton menuStartButton, menuTutorialButton;
     private Button menuSettingsButton;
@@ -51,8 +48,6 @@ public class MainMenu implements Screen ,InputProcessor {
    public MainMenu(MainClass mainClass){
         this.mainClass = mainClass;
     }
-
-
 
 
     //this is like the create() method instantiate all objects we need
@@ -87,8 +82,8 @@ public class MainMenu implements Screen ,InputProcessor {
 
     private void setupStartButton()
     {
-        menuStartButtonAtlas = new TextureAtlas("ui/menu/menuStartButton.pack"); //TODO neue Grafik für Buttons
-        menuStartButtonSkin = new Skin(menuStartButtonAtlas);
+        TextureAtlas menuStartButtonAtlas = new TextureAtlas("ui/menu/menuStartButton.pack"); //TODO neue Grafik für Buttons
+        Skin menuStartButtonSkin = new Skin(menuStartButtonAtlas);
 
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         style.up = menuStartButtonSkin.getDrawable("menuStartButton.up");
@@ -112,8 +107,8 @@ public class MainMenu implements Screen ,InputProcessor {
 
     private void setupTutorialButton()
     {
-        menuTutorialButtonAtlas = new TextureAtlas("ui/menu/menuTutorialButton.pack");
-        menuTutorialButtonSkin = new Skin(menuTutorialButtonAtlas);
+        TextureAtlas menuTutorialButtonAtlas = new TextureAtlas("ui/menu/menuTutorialButton.pack");
+        Skin menuTutorialButtonSkin = new Skin(menuTutorialButtonAtlas);
 
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         style.up = menuTutorialButtonSkin.getDrawable("menuTutorialButton.up");
@@ -137,8 +132,8 @@ public class MainMenu implements Screen ,InputProcessor {
 
     private void setupSettingsButton()
     {
-        menuSettingsButtonAtlas = new TextureAtlas("ui/menu/menuSettingsButton.pack");
-        menuSettingsButtonSkin = new Skin(menuSettingsButtonAtlas);
+        TextureAtlas menuSettingsButtonAtlas = new TextureAtlas("ui/menu/menuSettingsButton.pack");
+        Skin menuSettingsButtonSkin = new Skin(menuSettingsButtonAtlas);
 
         Button.ButtonStyle style = new Button.ButtonStyle();
         style.up = menuSettingsButtonSkin.getDrawable("menuSettingsButton.up");

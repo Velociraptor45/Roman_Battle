@@ -1,5 +1,6 @@
 package Fighter;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -11,10 +12,9 @@ import Constants.GameValues;
 
 public class Fighter extends Sprite
 {
-
-    public enum FighterMovementState{STANDING, MOVING, JUMPING, DUCKING}
+    public enum FighterMovementState{STANDING, MOVINGRIGHT, MOVINGLEFT, JUMPING, DUCKING}
     protected FighterMovementState movementState = FighterMovementState.STANDING;
-    public enum FighterFightingState {ATTACK, BLOCK, NONE}
+    public enum FighterFightingState {ATTACK_UP, ATTACK_DOWN, ATTACK, BLOCK, NONE}
     protected FighterFightingState fightingState = FighterFightingState.NONE;
 
     protected TextureRegion facingRight;
@@ -25,8 +25,8 @@ public class Fighter extends Sprite
     protected Animation <TextureRegion> jump;
     protected TextureAtlas atlas;
 
-    protected FighterMovementState currentState;
-    protected FighterMovementState previousState;
+    protected FighterMovementState currentMovementState;
+    protected FighterMovementState previousMovementState;
     protected float stateTimer;
 
     ////////////////////////////////////////////////////////////
@@ -37,25 +37,34 @@ public class Fighter extends Sprite
     public Fighter (TextureAtlas atlas, float xPos, float yPos)
     {
         this.atlas = atlas;
-        currentState = FighterMovementState.STANDING;
-        previousState = FighterMovementState.STANDING;
+        currentMovementState = FighterMovementState.STANDING;
+        previousMovementState = FighterMovementState.STANDING;
         stateTimer = 0f;
+
+
+
+
 
         //init animations
         //get Textureregion for animation run
         Array<TextureRegion> frames = new Array<TextureRegion>();
-        for (int i=0; i<11; i++){
-            frames.add(new TextureRegion(atlas.findRegion("run",i)));
-        }
+        //for (int i=0; i<11; i++){
+          //  frames.add(new TextureRegion(atlas.findRegion("run",i)));
+        //}
+        frames.add(new TextureRegion((atlas.findRegion("WALK1"))));
+        frames.add(new TextureRegion((atlas.findRegion("Walk2"))));
 
-        runAnimation = new Animation(1f/20,frames);
+        runAnimation = new Animation(1f/5,frames);
         frames.clear();
 
 
         //get images for jumpanimation
-        for (int i=0;i<11; i++) {
-            frames.add(new TextureRegion(atlas.findRegion("jump", i)));
-        }
+        //for (int i=0;i<11; i++) {
+        frames.add(new TextureRegion(atlas.findRegion("JUMP1")));
+        frames.add(new TextureRegion(atlas.findRegion("JUMP2")));
+        frames.add(new TextureRegion(atlas.findRegion("JUMP3")));
+        frames.add(new TextureRegion(atlas.findRegion("JUMP4")));
+       // }
 
         jump = new Animation(1f/10,frames);
         //get run animation frames
@@ -65,18 +74,29 @@ public class Fighter extends Sprite
         // jump = new Animation<TextureRegion>(1f/10f,atlas.findRegions("jump"));
 
         //picture in TextureAtlas at index 0
-        facingRight = new TextureRegion(atlas.findRegion("run",0));
-        facingLeft = new TextureRegion(atlas.findRegion("run",0));
+        facingRight = new TextureRegion(atlas.findRegion("IDLE"));
+        facingLeft = new TextureRegion(atlas.findRegion("IDLE"));
         facingLeft.flip(true,false);
 
         facingDirection = facingLeft;
         setPosition(xPos, yPos);
         setRegion(facingLeft);
+        setRegionWidth(30);
     }
 
     public void setMovementState(FighterMovementState state)
     {
         movementState = state;
+    }
+
+    public FighterMovementState getCurrentMovementState()
+    {
+        return movementState;
+    }
+
+    public FighterFightingState getCurrentFightingState()
+    {
+        return null; //TODO
     }
 
     public void setFightingState(FighterFightingState state)
@@ -89,11 +109,12 @@ public class Fighter extends Sprite
     }
 
     public TextureRegion getFrame(float delta){
-        currentState = movementState;
+        currentMovementState = movementState;
         TextureRegion region ;
 
-        switch (currentState){
-            case MOVING:
+        switch (currentMovementState){
+            case MOVINGRIGHT:
+            case MOVINGLEFT:
                 region = new TextureRegion(runAnimation.getKeyFrame(stateTimer,true));
                 break;
             case STANDING:
@@ -107,22 +128,30 @@ public class Fighter extends Sprite
                 break;
         }
 
-        stateTimer = currentState == previousState? stateTimer + delta :0;//TODO !!!!!!!!!!!!!!
-        previousState = currentState;
+        stateTimer = currentMovementState == previousMovementState? stateTimer + delta :0;//TODO !!!!!!!!!!!!!!
+        previousMovementState = currentMovementState;
         return region;
     }
 
-    public void moveRight(){
-        setPosition(getX() + GameValues.FIGHTER_MOVING_SPEED,getY());
-        facingDirection = facingLeft;
-
+    public void moveRight(int speed)
+    {
+        if(getX() + getRegionWidth() + speed <= Gdx.graphics.getWidth()) //TODO getWidth() austauschen
+        {
+            setPosition(getX() + speed, getY());
+        }
     }
 
-    public void moveLeft(){
-        setPosition(getX() - GameValues.FIGHTER_MOVING_SPEED,getY());
-        facingDirection = facingRight;
+    public void moveLeft(int speed)
+    {
+        if(getX() - speed >= 0)
+        {
+            setPosition(getX() - speed, getY());
+        }
     }
 
+    /*
+        returns true until maximum jump height is reached
+     */
     public boolean jump()
     {
         setPosition(getX(), getY() + calcJumpFallSpeed(getY() - GameValues.FIGHTER_ORIGINAL_HEIGHT));
@@ -157,8 +186,40 @@ public class Fighter extends Sprite
         //TODO
     }
 
+    public void block()
+    {
+
+    }
+
+    public void attackDown()
+    {
+
+    }
+
+    public void attackUp()
+    {
+
+    }
+
     public boolean isOnGround()
     {
         return getY() == GameValues.FIGHTER_ORIGINAL_HEIGHT;
+    }
+
+    public void takeDamage(int damage)
+    {
+        HP -= damage;
+    }
+
+    public void updateFacingDirection(Fighter fighter)
+    {
+        if(getX() < fighter.getX())
+        {
+            facingDirection = facingRight;
+        }
+        else
+        {
+            facingDirection = facingLeft;
+        }
     }
 }
