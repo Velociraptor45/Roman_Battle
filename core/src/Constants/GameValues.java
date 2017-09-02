@@ -20,6 +20,8 @@ public class GameValues
     public static final int AI_MOVING_SPEED = 3;
     public static final int AI_MOVING_SPEED_WHILE_ATTACK = 5;
     public static final int PLAYER_MOVING_SPEED = 10;
+
+    public static final float FIGHTER_ATTACK_DURATION = 0.7f;
     //////////////////////////////////////////////////////////////////////
 
     //AI
@@ -36,11 +38,11 @@ public class GameValues
     public static final int AI_SHOULD_CHANGE_MOVE_CHANCE_CLOSE_DISTANCE = 50;
 
     //how long the ai goes in one direction before changing the direction
-    public static final float AI_STANDARD_MOVE_CHANGE_TIME = 1f;
+    public static final float AI_STANDARD_MOVE_CHANGE_TIME = 0.5f;
 
-    public static final int AI_MIN_TIME_STANDARD_MOVE = 1;
+    public static final int AI_MIN_TIME_STANDARD_MOVE = 3;
     public static final int AI_MIN_TIME_MOVING_IN_DIRECTION = 3;
-    public static final int AI_MIN_STANDING_TIME = 1;
+    public static final int AI_MIN_STANDING_TIME = 2;
 
     public static final int AI_MAX_PLAN_EXECUTION_TIME = 7;
 

@@ -344,7 +344,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         ai.update(delta);
 
 
-        //ai.act(player, delta);
+        ai.act(player, delta);
 
 
         switchPlayerMovementState();

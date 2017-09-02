@@ -47,7 +47,7 @@ public class AI extends Fighter
         }
         updateCurrentStates(plansToExecute.get(0));
 
-        executePlan();
+        executePlan(getDistanceToPlayer(player));
 
         ///////////////TODO austauschen
         /*Plan currentPlan = plansToExecute.get(0);
@@ -79,6 +79,16 @@ public class AI extends Fighter
                         if(getCurrentFightingMove(currentPlan) == FighterFightingState.ATTACK)
                         {
                             //AI is attacking
+                        }
+                        else if(currentPlan.isSecondMovementEnabled())
+                        {
+                            if(currentPlan.getExecutionTime() >= GameValues.AI_MIN_TIME_STANDARD_MOVE)
+                            {
+                                if(shouldExecute(GameValues.AI_SHOULD_CHANGE_MOVE_CHANCE_MEDIUM_DISTANCE))
+                                {
+                                    calculatePlanForCurrentSituation(player, distanceToPlayer);
+                                }
+                            }
                         }
                         else
                         {
@@ -278,7 +288,7 @@ public class AI extends Fighter
                 resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
             }
         }
-        Gdx.app.log("a", "new Plan");
+        //Gdx.app.log("New Plan", plansToExecute.get(0).getMovement().toString() + " " + plansToExecute.get(0).getSecondMovement() + " " + plansToExecute.get(0).getFighting().toString() + " " + getDistanceToPlayer(player));
     }
 
     private boolean canBeExecuted(Player player, Plan plan)
@@ -298,7 +308,7 @@ public class AI extends Fighter
         depending on the current movement and fighting state of the ai this method executes
          the movement
      */
-    private void executePlan()
+    private void executePlan(float distanceToPlayer)
     {
         if(movementState != FighterMovementState.JUMPING && getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
         {
@@ -308,10 +318,68 @@ public class AI extends Fighter
         {
             //TODO vervollständigen
             case MOVINGRIGHT:
-                moveRight(GameValues.AI_MOVING_SPEED);
+                if(!(fightingState == FighterFightingState.ATTACK || fightingState == FighterFightingState.ATTACK_DOWN || fightingState == FighterFightingState.ATTACK_UP))
+                {
+                    if(facingDirection == facingRight)
+                    {
+                        if(distanceToPlayer - GameValues.AI_MOVING_SPEED > 0)
+                        {
+                            //makes sure that AI doesn't walk through player
+                            moveRight(GameValues.AI_MOVING_SPEED);
+                        }
+                    }
+                    else
+                    {
+                        moveRight(GameValues.AI_MOVING_SPEED);
+                    }
+                }
+                else
+                {
+                    if(facingDirection == facingRight)
+                    {
+                        if(distanceToPlayer - GameValues.AI_MOVING_SPEED_WHILE_ATTACK >= - GameValues.AI_MOVING_SPEED_WHILE_ATTACK)
+                        {
+                            //makes sure that AI doesn't walk through player
+                            moveRight(GameValues.AI_MOVING_SPEED_WHILE_ATTACK);
+                        }
+                    }
+                    else
+                    {
+                        moveRight(GameValues.AI_MOVING_SPEED_WHILE_ATTACK);
+                    }
+                }
                 break;
             case MOVINGLEFT:
-                moveLeft(GameValues.AI_MOVING_SPEED);
+                if(!(fightingState == FighterFightingState.ATTACK || fightingState == FighterFightingState.ATTACK_DOWN || fightingState == FighterFightingState.ATTACK_UP))
+                {
+                    if(facingDirection == facingLeft)
+                    {
+                        if(distanceToPlayer - GameValues.AI_MOVING_SPEED > 0)
+                        {
+                            //makes sure that AI doesn't walk through player
+                            moveLeft(GameValues.AI_MOVING_SPEED);
+                        }
+                    }
+                    else
+                    {
+                        moveLeft(GameValues.AI_MOVING_SPEED);
+                    }
+                }
+                else
+                {
+                    if(facingDirection == facingLeft)
+                    {
+                        if(distanceToPlayer - GameValues.AI_MOVING_SPEED_WHILE_ATTACK >= - GameValues.AI_MOVING_SPEED_WHILE_ATTACK)
+                        {
+                            //makes sure that AI doesn't walk through player
+                            moveLeft(GameValues.AI_MOVING_SPEED_WHILE_ATTACK);
+                        }
+                    }
+                    else
+                    {
+                        moveLeft(GameValues.AI_MOVING_SPEED_WHILE_ATTACK);
+                    }
+                }
                 break;
             case JUMPING:
                 if(!jump())
@@ -326,7 +394,7 @@ public class AI extends Fighter
         switch(fightingState)
         {
             case ATTACK:
-                Gdx.app.log("Fight", "Attack!");
+                //Gdx.app.log("Fight", "Attack!");
                 break;
             default:
                 break;

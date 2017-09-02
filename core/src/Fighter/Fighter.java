@@ -126,7 +126,7 @@ public class Fighter extends Sprite
 
     public void moveRight(int speed)
     {
-        if(getX() + getWidth() + speed <= Gdx.graphics.getWidth()) //TODO getWidth() austauschen
+        if(getX() + getRegionWidth() + speed <= Gdx.graphics.getWidth()) //TODO getWidth() austauschen
         {
             setPosition(getX() + speed, getY());
         }
