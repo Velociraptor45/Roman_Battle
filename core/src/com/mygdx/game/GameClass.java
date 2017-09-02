@@ -61,7 +61,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     // we need the MainClass Objekt to access the SpriteBatch
     public GameClass(MainClass mainClass){
         this.mainClass = mainClass;
-        atlas = new TextureAtlas(Gdx.files.internal("moves.pack"));
+        //atlas = new TextureAtlas(Gdx.files.internal("moves.pack"));
+        atlas = new TextureAtlas(Gdx.files.internal("player.pack"));//TODO NEWWWWWWWWWWW 1
+
         player = new Player(atlas,700, GameValues.FIGHTER_ORIGINAL_HEIGHT);
         ai = new AI(0, atlas, 20, GameValues.FIGHTER_ORIGINAL_HEIGHT);
 

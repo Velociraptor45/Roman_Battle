@@ -41,21 +41,30 @@ public class Fighter extends Sprite
         previousMovementState = FighterMovementState.STANDING;
         stateTimer = 0f;
 
+
+
+
+
         //init animations
         //get Textureregion for animation run
         Array<TextureRegion> frames = new Array<TextureRegion>();
-        for (int i=0; i<11; i++){
-            frames.add(new TextureRegion(atlas.findRegion("run",i)));
-        }
+        //for (int i=0; i<11; i++){
+          //  frames.add(new TextureRegion(atlas.findRegion("run",i)));
+        //}
+        frames.add(new TextureRegion((atlas.findRegion("WALK1"))));
+        frames.add(new TextureRegion((atlas.findRegion("Walk2"))));
 
-        runAnimation = new Animation(1f/20,frames);
+        runAnimation = new Animation(1f/5,frames);
         frames.clear();
 
 
         //get images for jumpanimation
-        for (int i=0;i<11; i++) {
-            frames.add(new TextureRegion(atlas.findRegion("jump", i)));
-        }
+        //for (int i=0;i<11; i++) {
+        frames.add(new TextureRegion(atlas.findRegion("JUMP1")));
+        frames.add(new TextureRegion(atlas.findRegion("JUMP2")));
+        frames.add(new TextureRegion(atlas.findRegion("JUMP3")));
+        frames.add(new TextureRegion(atlas.findRegion("JUMP4")));
+       // }
 
         jump = new Animation(1f/10,frames);
         //get run animation frames
@@ -65,8 +74,8 @@ public class Fighter extends Sprite
         // jump = new Animation<TextureRegion>(1f/10f,atlas.findRegions("jump"));
 
         //picture in TextureAtlas at index 0
-        facingRight = new TextureRegion(atlas.findRegion("run",0));
-        facingLeft = new TextureRegion(atlas.findRegion("run",0));
+        facingRight = new TextureRegion(atlas.findRegion("IDLE"));
+        facingLeft = new TextureRegion(atlas.findRegion("IDLE"));
         facingLeft.flip(true,false);
 
         facingDirection = facingLeft;
