@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -64,8 +65,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         //atlas = new TextureAtlas(Gdx.files.internal("moves.pack"));
         atlas = new TextureAtlas(Gdx.files.internal("player.pack"));//TODO NEWWWWWWWWWWW 1
 
-        player = new Player(atlas,700, GameValues.FIGHTER_ORIGINAL_HEIGHT);
-        ai = new AI(0, atlas, 20, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        player = new Player(atlas, GameValues.PLAYER_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        ai = new AI(0, atlas, GameValues.AI_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
 
         player.updateFacingDirection(ai);
         ai.updateFacingDirection(player);
@@ -352,6 +353,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         switchPlayerMovementState();
         switchPlayerFightingState();
 
+        collision(player, ai);
+
         mainClass.getSpriteBatch().begin();
         mainClass.getSpriteBatch().draw(player,player.getX(),player.getY());
         mainClass.getSpriteBatch().draw(ai, ai.getX(), ai.getY());
@@ -360,6 +363,61 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
         gameStage.act(delta);
         gameStage.draw();
+    }
+
+    /*
+        checks collision of player and AI
+     */
+    private void collision(Player player, AI ai)
+    {
+        if(Intersector.overlaps(player.getBoundingRectangle(), ai.getBoundingRectangle()))
+        {
+            if(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.BLOCK || ai.getCurrentMovementState() == Fighter.FighterMovementState.DUCKING))
+            {
+                //player attacked nomal, ai couldn't block
+                ai.takeDamage(GameValues.PLAYER_DAMAGE);
+                ai.stun();
+            }
+            else if(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK && !(player.getCurrentFightingState() == Fighter.FighterFightingState.BLOCK || player.getCurrentMovementState() == Fighter.FighterMovementState.DUCKING))
+            {
+                //ai attacked normal, player couldn't block
+                player.takeDamage(GameValues.AI_DAMAGE);
+                player.stun();
+            }
+            else if(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP))
+            {
+                //player attacked from above
+                ai.takeDamage(GameValues.PLAYER_DAMAGE);
+                ai.stun();
+            }
+            else if(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN && !(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP))
+            {
+                //ai attacked from above
+                player.takeDamage(GameValues.AI_DAMAGE);
+                player.stun();
+            }
+            else if(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN))
+            {
+                //player attacked from underneath
+                ai.takeDamage(GameValues.PLAYER_DAMAGE);
+                ai.stun();
+            }
+            else if(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP && !(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN))
+            {
+                //ai attacked from underneath
+                player.takeDamage(GameValues.AI_DAMAGE);
+                player.stun();
+            }
+            else if((ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP || ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN || ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK) && (player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN || player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP || player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK))
+            {
+                //both attacked at the same time
+                ai.takeDamage(GameValues.PLAYER_DAMAGE);
+                player.takeDamage(GameValues.AI_DAMAGE);
+
+                ai.stun();
+                player.stun();
+            }
+        }
     }
 
     private void switchPlayerFightingState()
@@ -407,11 +465,13 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
         if(jump)
         {
+            Gdx.app.log("Player", "jump");
             player.setMovementState(Player.FighterMovementState.JUMPING);
             jump = player.jump();
         }
         else if(player.getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
         {
+            Gdx.app.log("Player", "fall");
             player.setMovementState(Player.FighterMovementState.JUMPING);
             player.fall();
         }

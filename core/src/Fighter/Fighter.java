@@ -96,7 +96,7 @@ public class Fighter extends Sprite
 
     public FighterFightingState getCurrentFightingState()
     {
-        return null; //TODO
+        return fightingState;
     }
 
     public void setFightingState(FighterFightingState state)
@@ -191,12 +191,22 @@ public class Fighter extends Sprite
 
     }
 
+    public void attack()
+    {
+
+    }
+
     public void attackDown()
     {
 
     }
 
     public void attackUp()
+    {
+
+    }
+
+    public void stun()
     {
 
     }

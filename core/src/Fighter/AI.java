@@ -13,52 +13,131 @@ import Constants.GameValues;
 public class AI extends Fighter
 {
     private ArrayList<Plan> plansToExecute;
-    private float timer, attackTimer, distanceToPlayer;
+    //the "try..." timers make sure that the AI has just one chance per attack to block, dodge, etc. this attack of the player
+    private float tryBlockTimer, tryDodgeForAttackDownTimer, tryDodgeForAttackUpTimer, tryCounterAttackTimer, attackTimer;
 
     public AI(int ID, TextureAtlas atlas, float xPos, float yPos)
     {
         super(atlas, xPos, yPos);
         plansToExecute = new ArrayList<Plan>();
-        timer = 0;
+        tryBlockTimer = 0;
+        tryDodgeForAttackDownTimer = 0;
+        tryDodgeForAttackUpTimer = 0;
+        tryCounterAttackTimer = 0;
         attackTimer = 0;
-        //plansToExecute.add(getPlan(FighterMovementState.MOVINGRIGHT, FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
-        //plansToExecute.add(getPlan(FighterMovementState.JUMPING, FighterFightingState.NONE));
     }
 
     //central method that is called every loop in GameClass.render() and that manages the AI actions
     public void act(Player player, float delta)
     {
-
-        timer += delta;
+        tryBlockTimer += delta;
+        tryDodgeForAttackDownTimer += delta;
+        tryDodgeForAttackUpTimer += delta;
+        tryCounterAttackTimer += delta;
         attackTimer += delta;
 
         checkForExecutedPlans();
 
-        if(plansToExecute.size() > 0)
+        if(!analysePlayerAction(player))
         {
-            //a plan is given and will be checked if it's up to date
-            plansToExecute.get(0).addDuration(delta);
-            isUpToDate(plansToExecute.get(0), player);
-        }
-        else
-        {
-            //no plan given and new one will be calculated
-            calculatePlanForCurrentSituation(player, getDistanceToPlayer(player));
+            if (plansToExecute.size() > 0)
+            {
+                //a plan is given and will be checked if it's up to date
+                plansToExecute.get(0).addDuration(delta);
+                isUpToDate(plansToExecute.get(0), player);
+            } else
+            {
+                //no plan given and new one will be calculated
+                calculatePlanForCurrentSituation(player, getDistanceToPlayer(player));
+            }
         }
         updateCurrentStates(plansToExecute.get(0));
 
-        executePlan(getDistanceToPlayer(player));
+        executePlan(getDistanceToPlayer(player), player);
+    }
 
-        ///////////////TODO austauschen
-        /*Plan currentPlan = plansToExecute.get(0);
-        currentPlan.addDuration(delta);
-        setMovementState(currentPlan.getMovement());
-        executePlan();*/
+    private boolean analysePlayerAction(Player player)
+    {
+        switch (player.getCurrentFightingState())
+        {
+            case ATTACK:
+                if(tryBlockTimer >= GameValues.FIGHTER_ATTACK_DURATION)
+                {
+                    if (shouldExecute(GameValues.AI_BLOCK_CHANCE))
+                    {
+                        resetAndAddPlanToArray(getPlan(FighterMovementState.STANDING, FighterFightingState.BLOCK));
+                        return true;
+                    }
+                    tryBlockTimer = 0;
+                }
+                break;
+            case ATTACK_DOWN:
+                if(tryDodgeForAttackDownTimer >= GameValues.FIGHTER_JUMP_DURATION)
+                {
+                    if (shouldExecute(GameValues.AI_DODGE_ATTACK_FROM_ABOVE_CHANCE))
+                    {
+                        if (facingDirection == facingRight)
+                        {
+                            resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
+                        } else
+                        {
+                            resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
+                        }
+                        return true;
+                    }
+                    tryDodgeForAttackDownTimer = 0;
+                }
+                break;
+            case ATTACK_UP:
+                if(tryDodgeForAttackUpTimer >= GameValues.FIGHTER_JUMP_DURATION)
+                {
+                    if (!isOnGround() && shouldExecute(GameValues.AI_DODGE_ATTACK_FROM_UNDERNEATH_CHANCE))
+                    {
+                        if (plansToExecute.size() > 0)
+                        {
+                            if (plansToExecute.get(0).getOriginalFacingDirection() == facingRight)
+                            {
+                                resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
+                            } else
+                            {
+                                resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
+                            }
+
+                            return true;
+                        }
+                    }
+                    tryDodgeForAttackUpTimer = 0;
+                }
+                break;
+            default:
+
+                break;
+        }
+
+        switch (player.getCurrentMovementState())
+        {
+            case JUMPING:
+                if(tryCounterAttackTimer >= GameValues.FIGHTER_JUMP_DURATION)
+                {
+                    if (isOnGround() && shouldExecute(GameValues.AI_COUNTER_ATTACK_JUMP_CHANCE))
+                    {
+                        resetAndAddPlanToArray(getPlan(FighterMovementState.JUMPING, FighterFightingState.ATTACK_UP));
+                        return true;
+                    }
+                    Gdx.app.log("AI", "tried!");
+                    tryCounterAttackTimer = 0;
+                }
+                break;
+            default:
+
+                return false;
+        }
+        return false;
     }
 
     private void isUpToDate(Plan currentPlan, Player player)
     {
-        distanceToPlayer = getDistanceToPlayer(player);
+        float distanceToPlayer = getDistanceToPlayer(player);
         if (distanceToPlayer >= GameValues.AI_START_FIGHTING_DISTANCE)
         {
             //AI is too far away and has to decrease the distance to the player
@@ -276,6 +355,10 @@ public class AI extends Fighter
                     }
                 }
             }
+            else
+            {
+                resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterMovementState.MOVINGLEFT, FighterFightingState.NONE)); //TODO austauschen
+            }
         }
         else //if(distance > GameValues.AI_START_FIGHTING_DISTANCE)
         {
@@ -288,7 +371,7 @@ public class AI extends Fighter
                 resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
             }
         }
-        //Gdx.app.log("New Plan", plansToExecute.get(0).getMovement().toString() + " " + plansToExecute.get(0).getSecondMovement() + " " + plansToExecute.get(0).getFighting().toString() + " " + getDistanceToPlayer(player));
+        Gdx.app.log("New Plan", plansToExecute.get(0).getMovement().toString() + " " + plansToExecute.get(0).getSecondMovement() + " " + plansToExecute.get(0).getFighting().toString() + " " + getDistanceToPlayer(player));
     }
 
     private boolean canBeExecuted(Player player, Plan plan)
@@ -300,7 +383,8 @@ public class AI extends Fighter
     private boolean shouldExecute(int chance)
     {
         Random r = new Random();
-        return (r.nextInt(100) <= chance);
+        int a = r.nextInt(100);
+        return (a < chance);
     }
 
 
@@ -308,93 +392,123 @@ public class AI extends Fighter
         depending on the current movement and fighting state of the ai this method executes
          the movement
      */
-    private void executePlan(float distanceToPlayer)
+    private void executePlan(float distanceToPlayer, Player player)
     {
         if(movementState != FighterMovementState.JUMPING && getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
         {
             fall();
         }
-        switch (movementState)
+        if(fightingState != FighterFightingState.BLOCK)
         {
-            //TODO vervollständigen
-            case MOVINGRIGHT:
-                if(!(fightingState == FighterFightingState.ATTACK || fightingState == FighterFightingState.ATTACK_DOWN || fightingState == FighterFightingState.ATTACK_UP))
-                {
-                    if(facingDirection == facingRight)
+            switch (movementState)
+            {
+                case MOVINGRIGHT:
+                    if ((player.getCurrentFightingState() == FighterFightingState.ATTACK_DOWN && isOnGround()) || (player.getCurrentFightingState() == FighterFightingState.ATTACK_UP && !isOnGround()))
                     {
-                        if(distanceToPlayer - GameValues.AI_MOVING_SPEED > 0)
+                        //player is attacking down and AI has to dodge on the ground
+                        //or player is attacking up and AI has to dodge in the air
+                        moveRight(GameValues.AI_MOVING_SPEED_DODGE);
+                    }
+                    else if (!(fightingState == FighterFightingState.ATTACK || fightingState == FighterFightingState.ATTACK_DOWN || fightingState == FighterFightingState.ATTACK_UP))
+                    {
+                        if (facingDirection == facingRight)
                         {
-                            //makes sure that AI doesn't walk through player
+                            if (distanceToPlayer - GameValues.AI_MOVING_SPEED > 0)
+                            {
+                                //makes sure that AI doesn't walk through player
+                                moveRight(GameValues.AI_MOVING_SPEED);
+                            }
+                        }
+                        else
+                        {
                             moveRight(GameValues.AI_MOVING_SPEED);
                         }
                     }
                     else
                     {
-                        moveRight(GameValues.AI_MOVING_SPEED);
-                    }
-                }
-                else
-                {
-                    if(facingDirection == facingRight)
-                    {
-                        if(distanceToPlayer - GameValues.AI_MOVING_SPEED_WHILE_ATTACK >= - GameValues.AI_MOVING_SPEED_WHILE_ATTACK)
+                        if (facingDirection == facingRight)
                         {
-                            //makes sure that AI doesn't walk through player
+                            if (distanceToPlayer - GameValues.AI_MOVING_SPEED_WHILE_ATTACK >= -GameValues.AI_MOVING_SPEED_WHILE_ATTACK)
+                            {
+                                //makes sure that AI doesn't walk through player
+                                moveRight(GameValues.AI_MOVING_SPEED_WHILE_ATTACK);
+                            }
+                        }
+                        else
+                        {
                             moveRight(GameValues.AI_MOVING_SPEED_WHILE_ATTACK);
                         }
                     }
-                    else
+                    break;
+                case MOVINGLEFT:
+                    if ((player.getCurrentFightingState() == FighterFightingState.ATTACK_DOWN && isOnGround())  || (player.getCurrentFightingState() == FighterFightingState.ATTACK_UP && !isOnGround()))
                     {
-                        moveRight(GameValues.AI_MOVING_SPEED_WHILE_ATTACK);
+                        //player is attacking down and AI has to dodge on the ground
+                        //or player is attacking up and AI has to dodge in the air
+                        moveLeft(GameValues.AI_MOVING_SPEED_DODGE);
                     }
-                }
-                break;
-            case MOVINGLEFT:
-                if(!(fightingState == FighterFightingState.ATTACK || fightingState == FighterFightingState.ATTACK_DOWN || fightingState == FighterFightingState.ATTACK_UP))
-                {
-                    if(facingDirection == facingLeft)
+                    else if (!(fightingState == FighterFightingState.ATTACK || fightingState == FighterFightingState.ATTACK_DOWN || fightingState == FighterFightingState.ATTACK_UP))
                     {
-                        if(distanceToPlayer - GameValues.AI_MOVING_SPEED > 0)
+                        if (facingDirection == facingLeft)
                         {
-                            //makes sure that AI doesn't walk through player
+                            if (distanceToPlayer - GameValues.AI_MOVING_SPEED > 0)
+                            {
+                                //makes sure that AI doesn't walk through player
+                                moveLeft(GameValues.AI_MOVING_SPEED);
+                            }
+                        }
+                        else
+                        {
                             moveLeft(GameValues.AI_MOVING_SPEED);
                         }
-                    }
-                    else
+                    } else
                     {
-                        moveLeft(GameValues.AI_MOVING_SPEED);
-                    }
-                }
-                else
-                {
-                    if(facingDirection == facingLeft)
-                    {
-                        if(distanceToPlayer - GameValues.AI_MOVING_SPEED_WHILE_ATTACK >= - GameValues.AI_MOVING_SPEED_WHILE_ATTACK)
+                        if (facingDirection == facingLeft)
                         {
-                            //makes sure that AI doesn't walk through player
+                            if (distanceToPlayer - GameValues.AI_MOVING_SPEED_WHILE_ATTACK >= -GameValues.AI_MOVING_SPEED_WHILE_ATTACK)
+                            {
+                                //makes sure that AI doesn't walk through player
+                                moveLeft(GameValues.AI_MOVING_SPEED_WHILE_ATTACK);
+                            }
+                        }
+                        else
+                        {
                             moveLeft(GameValues.AI_MOVING_SPEED_WHILE_ATTACK);
                         }
                     }
-                    else
+                    break;
+                case JUMPING:
+                    if (!jump())
                     {
-                        moveLeft(GameValues.AI_MOVING_SPEED_WHILE_ATTACK);
+                        plansToExecute.get(0).setMovement(FighterMovementState.STANDING);
                     }
-                }
-                break;
-            case JUMPING:
-                if(!jump())
-                {
-                    plansToExecute.get(0).setMovement(FighterMovementState.STANDING);
-                }
-                break;
-            default:
-                //Gdx.app.log("executePlan", "not right state for execution");
-                break;
+                    break;
+                case DUCKING:
+                    duck();
+                    break;
+                default:
+                    //Gdx.app.log("executePlan", "not right state for execution");
+                    break;
+            }
         }
+
         switch(fightingState)
         {
             case ATTACK:
+                attack();
                 //Gdx.app.log("Fight", "Attack!");
+                break;
+            case ATTACK_DOWN:
+                attackDown();
+                break;
+            case ATTACK_UP:
+                attackUp();
+                break;
+            case BLOCK:
+                block();
+                break;
+            case NONE:
+
                 break;
             default:
                 break;
@@ -466,12 +580,18 @@ public class AI extends Fighter
 
     private Plan getPlan(Fighter.FighterMovementState move, Fighter.FighterFightingState fight)
     {
-        return new Plan(move, fight);
+        Plan plan = new Plan(move, fight);
+        plan.setJumpInformation(facingDirection);
+
+        return plan;
     }
 
     private Plan getPlan(Fighter.FighterMovementState move, Fighter.FighterMovementState secMove, Fighter.FighterFightingState fight)
     {
-        return new Plan(move, secMove, fight);
+        Plan plan = new Plan(move, secMove, fight);
+        plan.setJumpInformation(facingDirection);
+
+        return plan;
     }
 
     private void addPlanToArray(Plan plan)
@@ -497,7 +617,6 @@ public class AI extends Fighter
         }
 
     }
-
 
     @Override
     public void setMovementState(FighterMovementState state)
