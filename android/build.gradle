@@ -132,8 +132,7 @@ idea {
         }
     }
 }
-    /*dependencies {
-  compile
-    'com.android.support:appcompat-v7:25.+'
-  compile 'com.android.support.constraint:constraint-layout:+'
-}*/
+    dependencies {
+        //compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+
+}
