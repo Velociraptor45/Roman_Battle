@@ -20,9 +20,11 @@ public class Fighter extends Sprite
     protected TextureRegion facingRight;
     protected TextureRegion facingLeft;
     protected TextureRegion facingDirection;
+    protected TextureRegion duck;
 
     protected Animation <TextureRegion> runAnimation;
     protected Animation <TextureRegion> jump;
+
     protected TextureAtlas atlas;
 
     protected FighterMovementState currentMovementState;
@@ -42,40 +44,29 @@ public class Fighter extends Sprite
         stateTimer = 0f;
 
 
-
-
-
         //init animations
-        //get Textureregion for animation run
-        Array<TextureRegion> frames = new Array<TextureRegion>();
-        //for (int i=0; i<11; i++){
-          //  frames.add(new TextureRegion(atlas.findRegion("run",i)));
-        //}
-        frames.add(new TextureRegion((atlas.findRegion("WALK1"))));
-        frames.add(new TextureRegion((atlas.findRegion("Walk2"))));
 
+        Array<TextureRegion> frames = new Array<TextureRegion>();
+
+        frames.add(new TextureRegion((atlas.findRegion("WALK1_C"))));
+        frames.add(new TextureRegion((atlas.findRegion("WALK2_C"))));
         runAnimation = new Animation(1f/5,frames);
         frames.clear();
 
 
-        //get images for jumpanimation
-        //for (int i=0;i<11; i++) {
-        frames.add(new TextureRegion(atlas.findRegion("JUMP1")));
-        frames.add(new TextureRegion(atlas.findRegion("JUMP2")));
-        frames.add(new TextureRegion(atlas.findRegion("JUMP3")));
-        frames.add(new TextureRegion(atlas.findRegion("JUMP4")));
-       // }
-
+        frames.add(new TextureRegion(atlas.findRegion("JUMP1_C")));
+        frames.add(new TextureRegion(atlas.findRegion("JUMP2_C")));
+        frames.add(new TextureRegion(atlas.findRegion("JUMP3_C")));
+        frames.add(new TextureRegion(atlas.findRegion("JUMP4_C")));
         jump = new Animation(1f/10,frames);
-        //get run animation frames
-        // runAnimation =new Animation<TextureRegion>(1f/10f,atlas.findRegions("run"));
+        frames.clear();
 
-        //get jump animation frames
-        // jump = new Animation<TextureRegion>(1f/10f,atlas.findRegions("jump"));
 
-        //picture in TextureAtlas at index 0
-        facingRight = new TextureRegion(atlas.findRegion("IDLE"));
-        facingLeft = new TextureRegion(atlas.findRegion("IDLE"));
+
+
+        duck = new TextureRegion(atlas.findRegion("DUCK_1_C"));
+        facingRight = new TextureRegion(atlas.findRegion("IDLE_C"));
+        facingLeft = new TextureRegion(atlas.findRegion("IDLE_C"));
         facingLeft.flip(true,false);
 
         facingDirection = facingLeft;
@@ -122,6 +113,9 @@ public class Fighter extends Sprite
                 break;
             case JUMPING:
                 region = new TextureRegion(jump.getKeyFrame(stateTimer,true));
+                break;
+            case DUCKING:
+                region = duck;
                 break;
             default:
                 region = facingDirection;

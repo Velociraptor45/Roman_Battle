@@ -39,7 +39,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     private MainClass mainClass;
     private Player player;
     private AI ai;
-    private TextureAtlas atlas;
+    private TextureAtlas atlasAI;
+    private TextureAtlas atlasPlayer;
 
 
     private Stage gameStage;
@@ -63,10 +64,11 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     public GameClass(MainClass mainClass){
         this.mainClass = mainClass;
         //atlas = new TextureAtlas(Gdx.files.internal("moves.pack"));
-        atlas = new TextureAtlas(Gdx.files.internal("player.pack"));//TODO NEWWWWWWWWWWW 1
+        atlasAI = new TextureAtlas(Gdx.files.internal("AI_Texture_Atlas.pack"));//TODO NEWWWWWWWWWWW 1
+        atlasPlayer = new TextureAtlas(Gdx.files.internal("Player_Texture_Atlas.pack"));
 
-        player = new Player(atlas, GameValues.PLAYER_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
-        ai = new AI(0, atlas, GameValues.AI_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        player = new Player(atlasPlayer, GameValues.PLAYER_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        ai = new AI(0, atlasAI, GameValues.AI_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
 
         player.updateFacingDirection(ai);
         ai.updateFacingDirection(player);
@@ -458,7 +460,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         else if(standing){
             player.setMovementState(Player.FighterMovementState.STANDING);
         }
-        else if(attackDown && !attack)
+        else if(attackDown && !attack)//
         {
             player.setMovementState(Player.FighterMovementState.DUCKING);
         }

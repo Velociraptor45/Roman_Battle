@@ -1,0 +1,75 @@
+
+AI_Texture_Atlas.pack.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+HIT_RIGHT_C
+  rotate: false
+  xy: 1, 661
+  size: 238, 353
+  orig: 238, 353
+  offset: 0, 0
+  index: -1
+HIT_LEFT_C
+  rotate: false
+  xy: 1, 298
+  size: 229, 361
+  orig: 229, 361
+  offset: 0, 0
+  index: -1
+IDLE_C
+  rotate: false
+  xy: 241, 652
+  size: 169, 362
+  orig: 169, 362
+  offset: 0, 0
+  index: -1
+JUMP1_C
+  rotate: false
+  xy: 412, 648
+  size: 169, 366
+  orig: 169, 366
+  offset: 0, 0
+  index: -1
+WALK2_C
+  rotate: false
+  xy: 583, 652
+  size: 169, 362
+  orig: 169, 362
+  offset: 0, 0
+  index: -1
+JUMP2_C
+  rotate: false
+  xy: 754, 680
+  size: 164, 334
+  orig: 164, 334
+  offset: 0, 0
+  index: -1
+WALK1_C
+  rotate: false
+  xy: 232, 303
+  size: 124, 347
+  orig: 124, 347
+  offset: 0, 0
+  index: -1
+JUMP3_C
+  rotate: false
+  xy: 1, 1
+  size: 159, 295
+  orig: 159, 295
+  offset: 0, 0
+  index: -1
+JUMP4_C
+  rotate: false
+  xy: 358, 412
+  size: 142, 234
+  orig: 142, 234
+  offset: 0, 0
+  index: -1
+DUCK_1_C
+  rotate: false
+  xy: 502, 475
+  size: 114, 171
+  orig: 114, 171
+  offset: 0, 0
+  index: -1

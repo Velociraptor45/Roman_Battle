@@ -1,0 +1,75 @@
+
+Player_Texture_Atlas.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+HIT_LEFT_C
+  rotate: false
+  xy: 1, 250
+  size: 166, 261
+  orig: 166, 261
+  offset: 0, 0
+  index: -1
+WALK1_C
+  rotate: false
+  xy: 1, 1
+  size: 88, 247
+  orig: 88, 247
+  offset: 0, 0
+  index: -1
+HIT_RIGHT_C
+  rotate: false
+  xy: 169, 258
+  size: 171, 253
+  orig: 171, 253
+  offset: 0, 0
+  index: -1
+JUMP1_C
+  rotate: false
+  xy: 342, 245
+  size: 123, 266
+  orig: 123, 266
+  offset: 0, 0
+  index: -1
+IDLE_C
+  rotate: false
+  xy: 467, 249
+  size: 122, 262
+  orig: 122, 262
+  offset: 0, 0
+  index: -1
+WALK2_C
+  rotate: false
+  xy: 591, 249
+  size: 122, 262
+  orig: 122, 262
+  offset: 0, 0
+  index: -1
+JUMP2_C
+  rotate: false
+  xy: 715, 277
+  size: 115, 234
+  orig: 115, 234
+  offset: 0, 0
+  index: -1
+JUMP3_C
+  rotate: false
+  xy: 832, 316
+  size: 105, 195
+  orig: 105, 195
+  offset: 0, 0
+  index: -1
+DUCK_1_C
+  rotate: false
+  xy: 91, 106
+  size: 94, 142
+  orig: 94, 142
+  offset: 0, 0
+  index: -1
+JUMP4_C
+  rotate: false
+  xy: 939, 377
+  size: 81, 134
+  orig: 81, 134
+  offset: 0, 0
+  index: -1
