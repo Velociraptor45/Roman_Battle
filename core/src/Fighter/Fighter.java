@@ -29,6 +29,8 @@ public class Fighter extends Sprite
     protected FighterMovementState previousMovementState;
     protected float stateTimer;
 
+    protected short wonGames = 0;
+
     ////////////////////////////////////////////////////////////
     protected int HP = GameValues.FIGHTER_HEALTH;
 
@@ -40,7 +42,7 @@ public class Fighter extends Sprite
         currentMovementState = FighterMovementState.STANDING;
         previousMovementState = FighterMovementState.STANDING;
         stateTimer = 0f;
-
+        wonGames = 0;
 
 
 
@@ -231,5 +233,15 @@ public class Fighter extends Sprite
         {
             facingDirection = facingLeft;
         }
+    }
+
+    public boolean isAlive()
+    {
+        return !(HP <= 0);
+    }
+
+    public void gameWon()
+    {
+        wonGames++;
     }
 }

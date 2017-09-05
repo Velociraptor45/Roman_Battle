@@ -12,6 +12,12 @@ public class GameValues
             //160dpi: DENSITY = 1
             //120dpi: DENSITY = 0.75 -> compare graphics api
 
+    //Game
+    public static final float GAME_RESET_TIME = 2f;
+    public static final float GAME_START_TIME = 2f;
+    public static final String GAME_PRE_MATCH_STRING = "Fight!";
+    public static final String GAME_POST_MATCH_STRING = "K.O.";
+
     //Fighter
     public static final int FIGHTER_HEALTH = 100;
 

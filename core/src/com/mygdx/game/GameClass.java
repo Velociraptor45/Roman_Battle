@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import Constants.GameValues;
@@ -43,9 +45,14 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
 
     private Stage gameStage;
-    private Table movementButtonsTable, jbaButtonsTable; //jba = jump block attack
+    private Table movementButtonsTable, jbaButtonsTable, textFieldTable; //jba = jump block attack
     private Button buttonLeft, buttonRight, buttonUp, buttonDown;
     private TextButton buttonAttack, buttonBlock, buttonJump;
+    private TextField textFieldPreMatch, textFieldPostMatch;
+
+    private boolean gameIsRunning, preMatchIsRunning;
+    private float gameResetTimer, gameStartTimer;
+    private String postMatchString, preMatchString;
 
     ////////////////////////////////////////////////////////////////////////
     private boolean moveRight = false;
@@ -70,6 +77,13 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
         player.updateFacingDirection(ai);
         ai.updateFacingDirection(player);
+
+        gameIsRunning = true;
+        preMatchIsRunning = false;
+        gameResetTimer = 0;
+        gameStartTimer = 0;
+        postMatchString = GameValues.GAME_POST_MATCH_STRING;
+        preMatchString = GameValues.GAME_PRE_MATCH_STRING;
     }
 
     //this is like the create() method
@@ -88,6 +102,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         jbaButtonsTable = new Table();
         movementButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         jbaButtonsTable.setBounds(0, 0 , Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        textFieldTable = new Table();
+        textFieldTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         setupUpButton();
         movementButtonsTable.row();
@@ -101,13 +117,47 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         jbaButtonsTable.row();
         setupAttackButton();
 
+        setupPreMatchTextField();
+        setupPostMatchTextField();
+
+        textFieldTable.center();
         movementButtonsTable.bottom().left();
         jbaButtonsTable.bottom().right();
 
+        textFieldTable.debug();
         movementButtonsTable.debug();
         jbaButtonsTable.debug();
+        gameStage.addActor(textFieldTable);
         gameStage.addActor(movementButtonsTable);
         gameStage.addActor(jbaButtonsTable);
+    }
+
+    private void setupPreMatchTextField()
+    {
+        /*FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/arial.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 24;
+        BitmapFont font = generator.generateFont(parameter);
+        generator.dispose();*/
+
+        TextField.TextFieldStyle style = new TextField.TextFieldStyle();
+        style.font = new BitmapFont();
+        style.fontColor = Color.WHITE;
+
+        textFieldPreMatch = new TextField(preMatchString, style);
+
+        textFieldTable.add(textFieldPreMatch);
+    }
+
+    private void setupPostMatchTextField()
+    {
+        TextField.TextFieldStyle style = new TextField.TextFieldStyle();
+        style.font = new BitmapFont();
+        style.fontColor = Color.WHITE;
+
+        textFieldPostMatch = new TextField(postMatchString, style);
+
+        //textFieldTable.add(textFieldPostMatch);
     }
 
     private void setupLeftButton()
@@ -340,20 +390,48 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        player.updateFacingDirection(ai);
-        ai.updateFacingDirection(player);
+        if(gameIsRunning)
+        {
+            //actual game is running
+            player.updateFacingDirection(ai);
+            ai.updateFacingDirection(player);
 
-        player.update(delta);
-        ai.update(delta);
+            player.update(delta);
+            ai.update(delta);
 
 
-        ai.act(player, delta);
+            ai.act(player, delta);
 
 
-        switchPlayerMovementState();
-        switchPlayerFightingState();
+            switchPlayerMovementState();
+            switchPlayerFightingState();
 
-        collision(player, ai);
+            collision(player, ai);
+
+            areFightersAlive();
+        }
+        else if(preMatchIsRunning)
+        {
+            //pre match display is shown, game will start
+            gameStartTimer += delta;
+            if(gameStartTimer >= GameValues.GAME_START_TIME)
+            {
+                startGame();
+            }
+        }
+        else
+        {
+            //at least one Fighter is K.O.
+            if(gameResetTimer >= GameValues.GAME_RESET_TIME)
+            {
+                reset();
+            }
+            else
+            {
+                gameResetTimer += delta;
+            }
+        }
+
 
         mainClass.getSpriteBatch().begin();
         mainClass.getSpriteBatch().draw(player,player.getX(),player.getY());
@@ -364,6 +442,71 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         gameStage.act(delta);
         gameStage.draw();
     }
+
+    private void reset()
+    {
+        gameIsRunning = false;
+        preMatchIsRunning = true;
+        gameResetTimer = 0;
+        gameStartTimer = 0;
+        textFieldTable.clearChildren();
+        textFieldPostMatch.setText(GameValues.GAME_POST_MATCH_STRING);
+
+        player = new Player(atlas, GameValues.PLAYER_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        ai = new AI(0, atlas, GameValues.AI_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+
+        player.updateFacingDirection(ai);
+        ai.updateFacingDirection(player);
+    }
+
+    private void startGame()
+    {
+        gameIsRunning = true;
+        preMatchIsRunning = false;
+        textFieldTable.clearChildren();
+    }
+
+    /*
+        checks if one of the fighters is K.O. and ends the game
+     */
+    private void areFightersAlive()
+    {
+        if(!player.isAlive())
+        {
+            if(!ai.isAlive())
+            {
+                tie();
+            }
+            else
+            {
+                hasWon(ai);
+            }
+            gameIsRunning = false;
+            showPostMatchScreen();
+        }
+        else if(!ai.isAlive())
+        {
+            hasWon(player);
+            gameIsRunning = false;
+            showPostMatchScreen();
+        }
+    }
+
+    private void hasWon(Fighter winner)
+    {
+        winner.gameWon();
+    }
+
+    private void tie()
+    {
+        textFieldPostMatch.setText("TIE");
+    }
+
+    private void showPostMatchScreen()
+    {
+        textFieldTable.add(textFieldPostMatch);
+    }
+
 
     /*
         checks collision of player and AI
@@ -446,7 +589,6 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
     private void switchPlayerMovementState()
     {
-        //TODO switch wohl sauberer
         if(moveRight){
             player.moveRight(GameValues.PLAYER_MOVING_SPEED);
             player.setMovementState(Player.FighterMovementState.MOVINGRIGHT);
@@ -455,12 +597,12 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             player.moveLeft(GameValues.PLAYER_MOVING_SPEED);
             player.setMovementState(Player.FighterMovementState.MOVINGLEFT);
         }
-        else if(standing){
-            player.setMovementState(Player.FighterMovementState.STANDING);
-        }
-        else if(attackDown && !attack)
+        else if(duck)
         {
             player.setMovementState(Player.FighterMovementState.DUCKING);
+        }
+        else if(standing){
+            player.setMovementState(Player.FighterMovementState.STANDING);
         }
 
         if(jump)

@@ -277,12 +277,23 @@ public class AI extends Fighter
 
     /*
         isUpToDate() calls this method when the current plan is not up to date because the
-        situation has dramatically changed;
+        situation has dramatically changed or the last plan has expired;
         a completely new plan will be calculated
     */
     private void calculatePlanForCurrentSituation(Player player, float distance)
     {
-        if(distance <= GameValues.AI_START_ATTCKING_DISTANCE)
+        if(distance <= 0)
+        {
+            if(facingDirection == facingRight)
+            {
+                resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
+            }
+            else
+            {
+                resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
+            }
+        }
+        else if(distance <= GameValues.AI_START_ATTCKING_DISTANCE)
         {
             //AI is close to the player
             if (player.isOnGround())
