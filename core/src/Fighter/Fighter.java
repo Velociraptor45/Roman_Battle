@@ -10,10 +10,14 @@ import com.badlogic.gdx.utils.Array;
 
 import Constants.GameValues;
 
+import static Fighter.Fighter.FighterFightingState.BLOCK;
+import static Fighter.Fighter.FighterFightingState.NONE;
+
 public class Fighter extends Sprite
 {
     public enum FighterMovementState{STANDING, MOVINGRIGHT, MOVINGLEFT, JUMPING, DUCKING}
     protected FighterMovementState movementState = FighterMovementState.STANDING;
+
     public enum FighterFightingState {ATTACK_UP, ATTACK_DOWN, ATTACK, BLOCK, NONE}
     protected FighterFightingState fightingState = FighterFightingState.NONE;
 
@@ -21,6 +25,15 @@ public class Fighter extends Sprite
     protected TextureRegion facingLeft;
     protected TextureRegion facingDirection;
     protected TextureRegion duck;
+
+    //TODO///////////////////////////////////////////////////
+    protected TextureRegion blocked;
+    protected TextureRegion hitHigh;
+    protected TextureRegion jumpKick; // für schlag nach unten
+    protected TextureRegion hit;
+
+
+
 
     protected Animation <TextureRegion> runAnimation;
     protected Animation <TextureRegion> jump;
@@ -67,6 +80,8 @@ public class Fighter extends Sprite
 
 
         duck = new TextureRegion(atlas.findRegion("DUCK_1_C"));
+        blocked = new TextureRegion(atlas.findRegion("BLOCK_1_C"));
+
         facingRight = new TextureRegion(atlas.findRegion("IDLE_C"));
         facingLeft = new TextureRegion(atlas.findRegion("IDLE_C"));
         facingLeft.flip(true,false);
@@ -101,20 +116,48 @@ public class Fighter extends Sprite
         setRegion(getFrame(delta));
     }
 
-    public TextureRegion getFrame(float delta){
-        currentMovementState = movementState;
-        TextureRegion region ;
 
-        switch (currentMovementState){
+
+
+
+
+
+    public TextureRegion getFrame(float delta){
+        TextureRegion region;
+
+        if (fightingState == NONE) {
+           region = getmovestate();
+
+        } else {
+            switch (getCurrentFightingState()){
+                case BLOCK:
+                    region = blocked;
+                    break;
+                default:
+                    region= getmovestate();
+                    break;
+                }
+        }
+
+        stateTimer = currentMovementState == previousMovementState? stateTimer + delta :0;//TODO !!!!!!!!!!!!!!
+        previousMovementState = currentMovementState;
+        return region;
+    }
+
+
+    private TextureRegion getmovestate(){
+        TextureRegion region;
+        currentMovementState = movementState;
+        switch (currentMovementState) {
             case MOVINGRIGHT:
             case MOVINGLEFT:
-                region = new TextureRegion(runAnimation.getKeyFrame(stateTimer,true));
+                region = new TextureRegion(runAnimation.getKeyFrame(stateTimer, true));
                 break;
             case STANDING:
                 region = facingDirection;
                 break;
             case JUMPING:
-                region = new TextureRegion(jump.getKeyFrame(stateTimer,true));
+                region = new TextureRegion(jump.getKeyFrame(stateTimer, true));
                 break;
             case DUCKING:
                 region = duck;
@@ -123,11 +166,14 @@ public class Fighter extends Sprite
                 region = facingDirection;
                 break;
         }
-
-        stateTimer = currentMovementState == previousMovementState? stateTimer + delta :0;//TODO !!!!!!!!!!!!!!
-        previousMovementState = currentMovementState;
         return region;
+
     }
+
+
+
+
+
 
     public void moveRight(int speed)
     {

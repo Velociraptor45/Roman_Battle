@@ -3,72 +3,93 @@ AI.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+HIT_HIGH2_C
+  rotate: false
+  xy: 1, 230
+  size: 157, 281
+  orig: 157, 281
+  offset: 0, 0
+  index: -1
 HIT_LEFT_C
   rotate: false
-  xy: 1, 250
+  xy: 160, 250
   size: 166, 261
   orig: 166, 261
   offset: 0, 0
   index: -1
-WALK1_C
-  rotate: false
-  xy: 1, 1
-  size: 88, 247
-  orig: 88, 247
-  offset: 0, 0
-  index: -1
 HIT_RIGHT_C
   rotate: false
-  xy: 169, 258
+  xy: 328, 258
   size: 171, 253
   orig: 171, 253
   offset: 0, 0
   index: -1
 JUMP1_C
   rotate: false
-  xy: 342, 245
+  xy: 501, 245
   size: 123, 266
   orig: 123, 266
   offset: 0, 0
   index: -1
 IDLE_C
   rotate: false
-  xy: 467, 249
+  xy: 626, 249
   size: 122, 262
   orig: 122, 262
   offset: 0, 0
   index: -1
 WALK2_C
   rotate: false
-  xy: 591, 249
+  xy: 750, 249
   size: 122, 262
   orig: 122, 262
   offset: 0, 0
   index: -1
-JUMP2_C
+BLOCK_1_C
   rotate: false
-  xy: 715, 277
-  size: 115, 234
-  orig: 115, 234
+  xy: 874, 262
+  size: 120, 249
+  orig: 120, 249
   offset: 0, 0
   index: -1
 JUMP3_C
   rotate: false
-  xy: 832, 316
+  xy: 1, 33
   size: 105, 195
   orig: 105, 195
   offset: 0, 0
   index: -1
 DUCK_1_C
   rotate: false
-  xy: 91, 77
+  xy: 108, 57
   size: 114, 171
   orig: 114, 171
   offset: 0, 0
   index: -1
+WALK1_C
+  rotate: false
+  xy: 224, 1
+  size: 88, 247
+  orig: 88, 247
+  offset: 0, 0
+  index: -1
+JUMP2_C
+  rotate: false
+  xy: 314, 14
+  size: 115, 234
+  orig: 115, 234
+  offset: 0, 0
+  index: -1
+JUMP_KICK_C
+  rotate: false
+  xy: 431, 78
+  size: 122, 165
+  orig: 122, 165
+  offset: 0, 0
+  index: -1
 JUMP4_C
   rotate: false
-  xy: 939, 377
+  xy: 555, 109
   size: 81, 134
   orig: 81, 134
   offset: 0, 0
