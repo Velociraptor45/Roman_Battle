@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -41,7 +42,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     private MainClass mainClass;
     private Player player;
     private AI ai;
-    private TextureAtlas atlas;
+    private TextureAtlas atlasAI;
+    private TextureAtlas atlasPlayer;
 
 
     private Stage gameStage;
@@ -70,10 +72,11 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     public GameClass(MainClass mainClass){
         this.mainClass = mainClass;
         //atlas = new TextureAtlas(Gdx.files.internal("moves.pack"));
-        atlas = new TextureAtlas(Gdx.files.internal("player.pack"));//TODO NEWWWWWWWWWWW 1
+        atlasAI = new TextureAtlas(Gdx.files.internal("fighter/AI.pack"));//TODO NEWWWWWWWWWWW 1
+        atlasPlayer = new TextureAtlas((Gdx.files.internal("fighter/player.pack")));
 
-        player = new Player(atlas, GameValues.PLAYER_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
-        ai = new AI(0, atlas, GameValues.AI_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        player = new Player(atlasPlayer, GameValues.PLAYER_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        ai = new AI(0, atlasAI, GameValues.AI_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
 
         player.updateFacingDirection(ai);
         ai.updateFacingDirection(player);
@@ -452,8 +455,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         textFieldTable.clearChildren();
         textFieldPostMatch.setText(GameValues.GAME_POST_MATCH_STRING);
 
-        player = new Player(atlas, GameValues.PLAYER_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
-        ai = new AI(0, atlas, GameValues.AI_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        player = new Player(atlasPlayer, GameValues.PLAYER_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        ai = new AI(0, atlasAI, GameValues.AI_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
 
         player.updateFacingDirection(ai);
         ai.updateFacingDirection(player);

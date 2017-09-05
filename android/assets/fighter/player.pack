@@ -1,5 +1,5 @@
 
-AI_Texture_Atlas.png
+player.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
@@ -61,9 +61,9 @@ JUMP3_C
   index: -1
 DUCK_1_C
   rotate: false
-  xy: 91, 77
-  size: 114, 171
-  orig: 114, 171
+  xy: 91, 106
+  size: 94, 142
+  orig: 94, 142
   offset: 0, 0
   index: -1
 JUMP4_C
