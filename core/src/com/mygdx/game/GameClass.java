@@ -62,7 +62,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     private boolean jump = false;
     private boolean standing = true;
     private boolean attackDown = false;
-    private boolean attackUp = true;
+    private boolean attackUp = false;
     private boolean duck = false;
     private boolean attack = false;
     private boolean block = false;
@@ -353,7 +353,13 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             {
                 block = true;
             }
+
         });
+
+
+
+
+
 
         jbaButtonsTable.add(buttonBlock);
     }

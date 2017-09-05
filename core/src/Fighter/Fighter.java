@@ -21,20 +21,20 @@ public class Fighter extends Sprite
     public enum FighterFightingState {ATTACK_UP, ATTACK_DOWN, ATTACK, BLOCK, NONE}
     protected FighterFightingState fightingState = FighterFightingState.NONE;
 
-    protected TextureRegion facingRight;
-    protected TextureRegion facingLeft;
-    protected TextureRegion facingDirection;
-    protected TextureRegion duck;
+    //protected TextureRegion facingRight;
+    //protected TextureRegion facingLeft;
+    //protected TextureRegion facingDirection;
+    protected  boolean facingRight = true;
+    protected boolean facingLeft = false;
+    protected String facingDirection;
 
-    //TODO///////////////////////////////////////////////////
+    protected TextureRegion standing;
+
+    protected TextureRegion duck;
     protected TextureRegion blocked;
     protected TextureRegion hitHigh;
     protected TextureRegion jumpKick; // für schlag nach unten
     protected TextureRegion hit;
-
-
-
-
     protected Animation <TextureRegion> runAnimation;
     protected Animation <TextureRegion> jump;
 
@@ -42,6 +42,8 @@ public class Fighter extends Sprite
 
     protected FighterMovementState currentMovementState;
     protected FighterMovementState previousMovementState;
+
+
     protected float stateTimer;
 
     protected short wonGames = 0;
@@ -49,7 +51,7 @@ public class Fighter extends Sprite
     ////////////////////////////////////////////////////////////
     protected int HP = GameValues.FIGHTER_HEALTH;
 
-    public Fighter() {}
+    public Fighter() {} //TODO ist das hier überflüssig?!
 
     public Fighter (TextureAtlas atlas, float xPos, float yPos)
     {
@@ -59,15 +61,14 @@ public class Fighter extends Sprite
         stateTimer = 0f;
         wonGames = 0;
 
-        //init animations
 
+        // init Animation
         Array<TextureRegion> frames = new Array<TextureRegion>();
 
         frames.add(new TextureRegion((atlas.findRegion("WALK1_C"))));
         frames.add(new TextureRegion((atlas.findRegion("WALK2_C"))));
         runAnimation = new Animation(1f/5,frames);
         frames.clear();
-
 
         frames.add(new TextureRegion(atlas.findRegion("JUMP1_C")));
         frames.add(new TextureRegion(atlas.findRegion("JUMP2_C")));
@@ -76,19 +77,20 @@ public class Fighter extends Sprite
         jump = new Animation(1f/10,frames);
         frames.clear();
 
-
-
-
+        // init Textures
         duck = new TextureRegion(atlas.findRegion("DUCK_1_C"));
         blocked = new TextureRegion(atlas.findRegion("BLOCK_1_C"));
+        hitHigh = new TextureRegion(atlas.findRegion("HIT_HIGH2_C"));
+        jumpKick = new TextureRegion(atlas.findRegion("JUMP_KICK_C"));
+        hit = new TextureRegion(atlas.findRegion("HIT_RIGHT_C"));
+        standing = new TextureRegion(atlas.findRegion("IDLE_C"));
+        //facingRight = new TextureRegion(atlas.findRegion("IDLE_C"));
+        //facingLeft = new TextureRegion(atlas.findRegion("IDLE_C"));
+        //facingLeft.flip(true,false);
 
-        facingRight = new TextureRegion(atlas.findRegion("IDLE_C"));
-        facingLeft = new TextureRegion(atlas.findRegion("IDLE_C"));
-        facingLeft.flip(true,false);
-
-        facingDirection = facingLeft;
+        //facingDirection = facingLeft;
         setPosition(xPos, yPos);
-        setRegion(facingLeft);
+        setRegion(standing);
         setRegionWidth(30);
     }
 
@@ -126,26 +128,48 @@ public class Fighter extends Sprite
         TextureRegion region;
 
         if (fightingState == NONE) {
-           region = getmovestate();
+           region = getMoveState();
 
         } else {
-            switch (getCurrentFightingState()){
-                case BLOCK:
-                    region = blocked;
-                    break;
-                default:
-                    region= getmovestate();
-                    break;
-                }
+           region = getFightState();
         }
 
         stateTimer = currentMovementState == previousMovementState? stateTimer + delta :0;//TODO !!!!!!!!!!!!!!
         previousMovementState = currentMovementState;
+
+        if ( facingLeft){
+            region.flip(true,false);
+
+        }
+
+        return region;
+    }
+
+    private TextureRegion getFightState(){
+        TextureRegion region;
+        switch (getCurrentFightingState()){
+            case BLOCK:
+                region = blocked;
+                break;
+            case ATTACK_UP:
+                region = hitHigh;
+                break;
+            case ATTACK_DOWN:
+                region = jumpKick;
+                break;
+            case ATTACK:
+                region = hit;
+                break;
+            default:
+                region= getMoveState();
+                break;
+        }
+
         return region;
     }
 
 
-    private TextureRegion getmovestate(){
+    private TextureRegion getMoveState(){
         TextureRegion region;
         currentMovementState = movementState;
         switch (currentMovementState) {
@@ -154,7 +178,7 @@ public class Fighter extends Sprite
                 region = new TextureRegion(runAnimation.getKeyFrame(stateTimer, true));
                 break;
             case STANDING:
-                region = facingDirection;
+                region = standing;
                 break;
             case JUMPING:
                 region = new TextureRegion(jump.getKeyFrame(stateTimer, true));
@@ -163,9 +187,10 @@ public class Fighter extends Sprite
                 region = duck;
                 break;
             default:
-                region = facingDirection;
+                region = standing;
                 break;
         }
+
         return region;
 
     }
@@ -267,11 +292,13 @@ public class Fighter extends Sprite
     {
         if(getX() < fighter.getX())
         {
-            facingDirection = facingRight;
+            facingDirection = "facingRight";
+            facingRight = true;
         }
         else
         {
-            facingDirection = facingLeft;
+            facingDirection = "facingLeft";
+            facingLeft = true;
         }
     }
 

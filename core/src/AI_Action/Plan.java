@@ -9,7 +9,7 @@ public class Plan
 {
     private boolean executed;
     private boolean enableSecondMovement;
-    private TextureRegion originalFacingDirection;
+    private String originalFacingDirection;
     private Fighter.FighterMovementState movement;
     private Fighter.FighterMovementState secondMovement;
     private Fighter.FighterFightingState fighting;
@@ -108,12 +108,12 @@ public class Plan
         secondMovement = state;
     }
 
-    public void setJumpInformation(TextureRegion faceDir)
+    public void setJumpInformation(String faceDir)
     {
         originalFacingDirection = faceDir;
     }
 
-    public TextureRegion getOriginalFacingDirection()
+    public String getOriginalFacingDirection()
     {
         if(movement == Fighter.FighterMovementState.JUMPING)
             return originalFacingDirection;
