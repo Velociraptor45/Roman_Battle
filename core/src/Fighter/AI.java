@@ -76,7 +76,7 @@ public class AI extends Fighter
                 {
                     if (shouldExecute(GameValues.AI_DODGE_ATTACK_FROM_ABOVE_CHANCE))
                     {
-                        if (facingRight)
+                        if (!facingLeft)
                         {
                             resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
                         } else
@@ -284,7 +284,7 @@ public class AI extends Fighter
     {
         if(distance <= 0)
         {
-            if(facingRight)
+            if(!facingLeft)
             {
                 resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
             }
@@ -308,7 +308,7 @@ public class AI extends Fighter
                         if (shouldExecute(GameValues.AI_ATTACK_JUMP_CHANCE))
                         {
                             //AI will do jump attack
-                            if (facingRight)
+                            if (!facingLeft)
                             {
                                 resetAndAddPlanToArray(getPlan(FighterMovementState.JUMPING, FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
                                 addPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.ATTACK_DOWN));
@@ -322,7 +322,7 @@ public class AI extends Fighter
                         else
                         {
                             //AI will do normal attack
-                            if ( facingRight)
+                            if ( !facingLeft)
                             {
                                 resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.ATTACK));
                             }
@@ -356,7 +356,7 @@ public class AI extends Fighter
                 else
                 {
                     //ai is jumping
-                    if (facingRight)
+                    if (!facingLeft)
                     {
                         resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.ATTACK_DOWN));
                     }
@@ -373,7 +373,7 @@ public class AI extends Fighter
         }
         else //if(distance > GameValues.AI_START_FIGHTING_DISTANCE)
         {
-            if(facingRight)
+            if(!facingLeft)
             {
                 resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
             }
@@ -422,7 +422,7 @@ public class AI extends Fighter
                     }
                     else if (!(fightingState == FighterFightingState.ATTACK || fightingState == FighterFightingState.ATTACK_DOWN || fightingState == FighterFightingState.ATTACK_UP))
                     {
-                        if ( facingRight)
+                        if ( !facingLeft)
                         {
                             if (distanceToPlayer - GameValues.AI_MOVING_SPEED > 0)
                             {
@@ -437,7 +437,7 @@ public class AI extends Fighter
                     }
                     else
                     {
-                        if (facingRight)
+                        if (!facingLeft)
                         {
                             if (distanceToPlayer - GameValues.AI_MOVING_SPEED_WHILE_ATTACK >= -GameValues.AI_MOVING_SPEED_WHILE_ATTACK)
                             {
