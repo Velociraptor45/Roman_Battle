@@ -47,7 +47,7 @@ public class Fighter extends Sprite
     protected FighterMovementState previousMovementState;
 
 
-    protected float stateTimer;
+    protected float stateTimer, blockTimer, attackTimer, attackUpTimer, attackDownTimer;
 
     protected short wonGames = 0;
 
@@ -62,6 +62,10 @@ public class Fighter extends Sprite
         currentMovementState = FighterMovementState.STANDING;
         previousMovementState = FighterMovementState.STANDING;
         stateTimer = 0f;
+        blockTimer = 0f;
+        attackTimer = 0f;
+        attackDownTimer = 0f;
+        attackUpTimer = 0f;
         wonGames = 0;
 
 
@@ -324,28 +328,65 @@ public class Fighter extends Sprite
         return -2*x;
     }
 
-    public void duck(){
-        //TODO
-    }
-
-    public void block()
+    public void duck()
     {
 
     }
 
-    public void attack()
+    public boolean block(float delta)
     {
-
+        blockTimer += delta;
+        if(blockTimer <= GameValues.FIGHTER_BLOCK_DURATION)
+        {
+            return true;
+        }
+        else
+        {
+            blockTimer = 0f;
+            return false;
+        }
     }
 
-    public void attackDown()
+    public boolean attack(float delta)
     {
-
+        attackTimer += delta;
+        if(attackTimer <= GameValues.FIGHTER_ATTACK_DURATION)
+        {
+            return true;
+        }
+        else
+        {
+            attackTimer = 0f;
+            return false;
+        }
     }
 
-    public void attackUp()
+    public boolean attackDown(float delta)
     {
+        attackDownTimer += delta;
+        if(attackDownTimer <= GameValues.FIGHTER_ATTACK_DOWN_DURATION)
+        {
+            return true;
+        }
+        else
+        {
+            attackDownTimer = 0f;
+            return false;
+        }
+    }
 
+    public boolean attackUp(float delta)
+    {
+        attackUpTimer += delta;
+        if(attackUpTimer <= GameValues.FIGHTER_ATTACK_UP_DURATION)
+        {
+            return true;
+        }
+        else
+        {
+            attackUpTimer = 0f;
+            return false;
+        }
     }
 
     public void stun()

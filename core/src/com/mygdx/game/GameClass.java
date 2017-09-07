@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.sun.org.apache.bcel.internal.generic.FLOAD;
 
 import Constants.GameValues;
 import Fighter.Fighter;
@@ -149,7 +150,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
         textFieldPreMatch = new TextField(preMatchString, style);
 
-        textFieldTable.add(textFieldPreMatch);
+        //textFieldTable.add(textFieldPreMatch);
     }
 
     private void setupPostMatchTextField()
@@ -159,8 +160,6 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         style.fontColor = Color.WHITE;
 
         textFieldPostMatch = new TextField(postMatchString, style);
-
-        //textFieldTable.add(textFieldPostMatch);
     }
 
     private void setupLeftButton()
@@ -411,9 +410,10 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
             ai.act(player, delta);
 
+            //checkAcceleration();
 
             switchPlayerMovementState();
-            switchPlayerFightingState();
+            switchPlayerFightingState(delta);
 
             collision(player, ai);
 
@@ -473,6 +473,54 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         gameIsRunning = true;
         preMatchIsRunning = false;
         textFieldTable.clearChildren();
+    }
+
+    private void checkAcceleration()
+    {
+        float accX = Gdx.input.getAccelerometerX();
+        float accY = Gdx.input.getAccelerometerY();
+        //Gdx.app.log("AccX", Float.toString(accX));
+        //Gdx.app.log("AccY", Float.toString(accY));
+        if(Math.abs(accX) > GameValues.GAME_ACCELEROMETER_X_MIN_SPEED)
+        {
+            if(Math.abs(accY) > Math.abs(accX) && !attack && !block)
+            {
+                //moved mobile phone faster in y-direction than in x-direction
+                //attack up or down
+                if(accY > 0 && !attackDown)
+                {
+                    //attack up
+                    attackUp = true;
+                }
+                else if(!player.isOnGround() && !attackUp)
+                {
+                    //attack down
+                    attackDown = true;
+                }
+            }
+            else
+            {
+                //attack left/right
+                if(!attackUp && !attackDown && !block)
+                {
+                    attack = true;
+                }
+            }
+        }
+        else if(Math.abs(accY) > GameValues.GAME_ACCELEROMETER_Y_MIN_SPEED)
+        {
+            if(!attack && !block)
+            {
+                if(accY > 0 && !attackDown)
+                {
+                    attackUp = true;
+                }
+                else if (!player.isOnGround() && !attackUp)
+                {
+                    attackDown = true;
+                }
+            }
+        }
     }
 
     /*
@@ -572,22 +620,26 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         }
     }
 
-    private void switchPlayerFightingState()
+    private void switchPlayerFightingState(float delta)
     {
         if(attackUp && attack)
         {
+            attackDown = player.attackDown(delta);
             player.setFightingState(Player.FighterFightingState.ATTACK_UP);
         }
         else if(attackDown && attack)
         {
+            attackDown = player.attackDown(delta);
             player.setFightingState(Player.FighterFightingState.ATTACK_DOWN);
         }
         else if(attack)
         {
+            attack = player.attack(delta);
             player.setFightingState(Player.FighterFightingState.ATTACK);
         }
         else if(block)
         {
+            block = player.block(delta);
             player.setFightingState(Player.FighterFightingState.BLOCK);
         }
         else
@@ -598,7 +650,11 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
     private void switchPlayerMovementState()
     {
-        if(moveRight){
+        if(duck)
+        {
+            player.setMovementState(Player.FighterMovementState.DUCKING);
+        }
+        else if(moveRight){
             player.moveRight(GameValues.PLAYER_MOVING_SPEED);
             player.setMovementState(Player.FighterMovementState.MOVINGRIGHT);
         }
@@ -606,15 +662,11 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             player.moveLeft(GameValues.PLAYER_MOVING_SPEED);
             player.setMovementState(Player.FighterMovementState.MOVINGLEFT);
         }
-        else if(duck)
-        {
-            player.setMovementState(Player.FighterMovementState.DUCKING);
-        }
         else if(standing){
             player.setMovementState(Player.FighterMovementState.STANDING);
         }
 
-        if(jump)
+        if(jump && !duck)
         {
             Gdx.app.log("Player", "jump");
             player.setMovementState(Player.FighterMovementState.JUMPING);

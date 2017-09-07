@@ -18,6 +18,9 @@ public class GameValues
     public static final String GAME_PRE_MATCH_STRING = "Fight!";
     public static final String GAME_POST_MATCH_STRING = "K.O.";
 
+    public static final float GAME_ACCELEROMETER_X_MIN_SPEED = 2f;
+    public static final float GAME_ACCELEROMETER_Y_MIN_SPEED = 2f;
+
     //Fighter
     public static final int FIGHTER_HEALTH = 100;
 
@@ -33,8 +36,11 @@ public class GameValues
     public static final int PLAYER_DAMAGE = 17;
     public static final int AI_DAMAGE = 17;
 
-    public static final float FIGHTER_ATTACK_DURATION = 0.7f;
+    public static final float FIGHTER_ATTACK_DURATION = 0.2f;
+    public static final float FIGHTER_ATTACK_UP_DURATION = 0.2f;
+    public static final float FIGHTER_ATTACK_DOWN_DURATION = 0.2f;
     public static final float FIGHTER_JUMP_DURATION = 0.5f; //TODO erneuern
+    public static final float FIGHTER_BLOCK_DURATION = 0.3f;
     //////////////////////////////////////////////////////////////////////
 
     //AI

@@ -53,7 +53,7 @@ public class AI extends Fighter
         }
         updateCurrentStates(plansToExecute.get(0));
 
-        executePlan(getDistanceToPlayer(player), player);
+        executePlan(getDistanceToPlayer(player), player, delta);
     }
 
     private boolean analysePlayerAction(Player player)
@@ -403,7 +403,7 @@ public class AI extends Fighter
         depending on the current movement and fighting state of the ai this method executes
          the movement
      */
-    private void executePlan(float distanceToPlayer, Player player)
+    private void executePlan(float distanceToPlayer, Player player, float delta)
     {
         if(movementState != FighterMovementState.JUMPING && getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
         {
@@ -506,17 +506,17 @@ public class AI extends Fighter
         switch(fightingState)
         {
             case ATTACK:
-                attack();
+                attack(delta);
                 //Gdx.app.log("Fight", "Attack!");
                 break;
             case ATTACK_DOWN:
-                attackDown();
+                attackDown(delta);
                 break;
             case ATTACK_UP:
-                attackUp();
+                attackUp(delta);
                 break;
             case BLOCK:
-                block();
+                block(delta);
                 break;
             case NONE:
 
