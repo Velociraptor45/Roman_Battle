@@ -24,7 +24,7 @@ public class GameValues
     //Fighter
     public static final int FIGHTER_HEALTH = 100;
 
-    public static final int FIGHTER_MAX_JUMP_HEIGHT = 300;
+    public static final int FIGHTER_MAX_JUMP_HEIGHT = 400;
     public static final int FIGHTER_ORIGINAL_HEIGHT = 150;
     public static final int PLAYER_ORIGINAL_X = 20;
     public static final int AI_ORIGINAL_X = 700;
@@ -61,11 +61,14 @@ public class GameValues
     public static final int AI_COUNTER_ATTACK_JUMP_CHANCE = 5;
 
 
-    public static final int AI_HEAD_TOWARDS_PLAYER_CHANCE = 40;
     //standard move = moving left/right alternately
     public static final int AI_STANDARD_MOVE_CHANCE_CLOSE = 40;
+    public static final int AI_GO_BACK_CHANCE_CLOSE = 10;
 
+    public static final int AI_JUMP_ATTACK_CHANCE_MEDIUM_DISTANCE = 10;
     public static final int AI_JUMP_CHANCE_MEDIUM_DISTANCE = 10;
+    public static final int AI_STANDARD_MOVE_CHANCE_MEDIUM_DISTANCE = 10;
+    public static final int AI_HEAD_TOWARDS_PLAYER_CHANCE_MEDIUM_DISTANCE = 40;
 
     public static final int AI_SHOULD_CHANGE_MOVE_CHANCE_MEDIUM_DISTANCE = 50;
     public static final int AI_SHOULD_CHANGE_MOVE_CHANCE_CLOSE_DISTANCE = 50;
@@ -74,15 +77,15 @@ public class GameValues
     public static final float AI_STANDARD_MOVE_CHANGE_TIME = 0.5f;
 
     public static final int AI_MIN_TIME_STANDARD_MOVE = 3;
-    public static final int AI_MIN_TIME_MOVING_IN_DIRECTION = 3;
-    public static final int AI_MIN_STANDING_TIME = 2;
+    public static final int AI_MIN_TIME_MOVING_IN_DIRECTION = 2;
+    public static final float AI_MIN_STANDING_TIME = 1.3f;
 
-    public static final int AI_MAX_PLAN_EXECUTION_TIME = 7;
+    public static final int AI_MAX_PLAN_EXECUTION_TIME = 5;
 
     //border between far and medium distance
     public static final int AI_START_FIGHTING_DISTANCE = 100;
     //border between medium and close distance
     public static final int AI_START_ATTCKING_DISTANCE = 40;
 
-    public static final int AI_TIMER_ATTACK = 10;
+    public static final int AI_TIMER_ATTACK = 3;
 }

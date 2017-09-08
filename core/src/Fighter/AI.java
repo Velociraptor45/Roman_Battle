@@ -74,6 +74,7 @@ public class AI extends Fighter
             case ATTACK_DOWN:
                 if(tryDodgeForAttackDownTimer >= GameValues.FIGHTER_JUMP_DURATION)
                 {
+                    if(plansToExecute.isEmpty() || plansToExecute.get(0).isSecondMovementEnabled() || (plansToExecute.get(0).getMovement() != FighterMovementState.MOVINGLEFT || plansToExecute.get(0).getMovement() != FighterMovementState.MOVINGRIGHT))
                     if (shouldExecute(GameValues.AI_DODGE_ATTACK_FROM_ABOVE_CHANCE))
                     {
                         if (!facingLeft)
@@ -163,7 +164,7 @@ public class AI extends Fighter
                         {
                             if(currentPlan.getExecutionTime() >= GameValues.AI_MIN_TIME_STANDARD_MOVE)
                             {
-                                if(shouldExecute(GameValues.AI_SHOULD_CHANGE_MOVE_CHANCE_MEDIUM_DISTANCE))
+                                if(shouldExecute(GameValues.AI_SHOULD_CHANGE_MOVE_CHANCE_CLOSE_DISTANCE))
                                 {
                                     calculatePlanForCurrentSituation(player, distanceToPlayer);
                                 }
@@ -191,7 +192,7 @@ public class AI extends Fighter
                 case STANDING:
                     if(currentPlan.getExecutionTime() >= GameValues.AI_MIN_STANDING_TIME)
                     {
-                        if(shouldExecute(GameValues.AI_SHOULD_CHANGE_MOVE_CHANCE_MEDIUM_DISTANCE))
+                        if(shouldExecute(GameValues.AI_SHOULD_CHANGE_MOVE_CHANCE_CLOSE_DISTANCE))
                         {
                             calculatePlanForCurrentSituation(player, distanceToPlayer);
                         }
@@ -275,7 +276,8 @@ public class AI extends Fighter
     }
 
 
-    /*
+    /**
+        @param distance: distance between the AI and the player
         isUpToDate() calls this method when the current plan is not up to date because the
         situation has dramatically changed or the last plan has expired;
         a completely new plan will be calculated
@@ -346,6 +348,18 @@ public class AI extends Fighter
                             //random block
                             resetAndAddPlanToArray(getPlan(FighterMovementState.STANDING, FighterFightingState.BLOCK));
                         }
+                        else if(shouldExecute(GameValues.AI_GO_BACK_CHANCE_CLOSE))
+                        {
+                            //AI moves backwards
+                            if(!facingLeft)
+                            {
+                                resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
+                            }
+                            else
+                            {
+                                resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
+                            }
+                        }
                         else
                         {
                             //standing still
@@ -368,11 +382,21 @@ public class AI extends Fighter
             }
             else
             {
-                resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterMovementState.MOVINGLEFT, FighterFightingState.NONE)); //TODO austauschen
+                //player is jumping
+                //should never reach this point because of analysePlayerAction()
+                if(!facingLeft)
+                {
+                    resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
+                }
+                else
+                {
+                    resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
+                }
             }
         }
-        else //if(distance > GameValues.AI_START_FIGHTING_DISTANCE)
+        else if(distance > GameValues.AI_START_FIGHTING_DISTANCE)
         {
+            //ai is far away from the player
             if(!facingLeft)
             {
                 resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
@@ -382,7 +406,60 @@ public class AI extends Fighter
                 resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
             }
         }
-        Gdx.app.log("New Plan", plansToExecute.get(0).getMovement().toString() + " " + plansToExecute.get(0).getSecondMovement() + " " + plansToExecute.get(0).getFighting().toString() + " " + getDistanceToPlayer(player));
+        else
+        {
+            //AI is between far away and close -> medium distance
+            if(shouldExecute(GameValues.AI_STANDARD_MOVE_CHANCE_MEDIUM_DISTANCE))
+            {
+                //standard move
+                resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
+            }
+            else if(shouldExecute(GameValues.AI_HEAD_TOWARDS_PLAYER_CHANCE_MEDIUM_DISTANCE))
+            {
+                //head towards player
+                if(!facingLeft)
+                {
+                    resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
+                }
+                else
+                {
+                    resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
+                }
+            }
+            else if(shouldExecute(GameValues.AI_JUMP_ATTACK_CHANCE_MEDIUM_DISTANCE))
+            {
+                //jump attack
+                if(!facingLeft)
+                {
+                    resetAndAddPlanToArray(getPlan(FighterMovementState.JUMPING, FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
+                    addPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.ATTACK_DOWN));
+                }
+                else
+                {
+                    resetAndAddPlanToArray(getPlan(FighterMovementState.JUMPING, FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
+                    addPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.ATTACK_DOWN));
+                }
+
+            }
+            else if(shouldExecute(GameValues.AI_JUMP_CHANCE_MEDIUM_DISTANCE))
+            {
+                //jump
+                if(!facingLeft)
+                {
+                    resetAndAddPlanToArray(getPlan(FighterMovementState.JUMPING, FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
+                }
+                else
+                {
+                    resetAndAddPlanToArray(getPlan(FighterMovementState.JUMPING, FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
+                }
+            }
+            else
+            {
+                //AI just standing
+                resetAndAddPlanToArray(getPlan(FighterMovementState.STANDING, FighterFightingState.NONE));
+            }
+        }
+        //Gdx.app.log("New Plan", plansToExecute.get(0).getMovement().toString() + " " + plansToExecute.get(0).getSecondMovement() + " " + plansToExecute.get(0).getFighting().toString() + " " + getDistanceToPlayer(player));
     }
 
     private boolean canBeExecuted(Player player, Plan plan)
@@ -516,7 +593,13 @@ public class AI extends Fighter
                 attackUp(delta);
                 break;
             case BLOCK:
-                block(delta);
+                if(!block(delta))
+                {
+                    if(!plansToExecute.isEmpty())
+                    {
+                        terminate(plansToExecute.get(0));
+                    }
+                }
                 break;
             case NONE:
 
@@ -528,7 +611,7 @@ public class AI extends Fighter
 
     private void terminate(Plan plan)
     {
-        if(plansToExecute.size() > 0)
+        if(plan != null)
         {
             plan.setExecuted(true);
         }

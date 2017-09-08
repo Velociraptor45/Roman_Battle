@@ -624,7 +624,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     {
         if(attackUp && attack)
         {
-            attackDown = player.attackDown(delta);
+            attackUp = player.attackUp(delta);
             player.setFightingState(Player.FighterFightingState.ATTACK_UP);
         }
         else if(attackDown && attack)
