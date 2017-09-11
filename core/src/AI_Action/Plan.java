@@ -20,7 +20,7 @@ public class Plan
     {
         executed = false;
         enableSecondMovement = false;
-        originalFacingDirection = null;
+        originalFacingDirection = "";
         durationMovementChange = 0;
         durationPlanExecution = 0;
         durationOfAttack = 0;

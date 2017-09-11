@@ -51,7 +51,14 @@ public class AI extends Fighter
                 calculatePlanForCurrentSituation(player, getDistanceToPlayer(player));
             }
         }
-        updateCurrentStates(plansToExecute.get(0));
+        if(!plansToExecute.isEmpty())
+        {
+            updateCurrentStates(plansToExecute.get(0));
+        }
+        else
+        {
+            updateCurrentStates(getPlan(FighterMovementState.STANDING, FighterFightingState.NONE));
+        }
 
         executePlan(getDistanceToPlayer(player), player, delta);
     }
@@ -96,7 +103,7 @@ public class AI extends Fighter
                     {
                         if (plansToExecute.size() > 0)
                         {
-                            if (plansToExecute.get(0).getOriginalFacingDirection().equals( "facingRight"))
+                            if (plansToExecute.get(0).getOriginalFacingDirection().equals("facingRight"))
                             {
                                 resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
                             } else
@@ -313,11 +320,13 @@ public class AI extends Fighter
                             if (!facingLeft)
                             {
                                 resetAndAddPlanToArray(getPlan(FighterMovementState.JUMPING, FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
+                                plansToExecute.get(0).setJumpInformation("facingRight");
                                 addPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.ATTACK_DOWN));
                             }
                             else
                             {
                                 resetAndAddPlanToArray(getPlan(FighterMovementState.JUMPING, FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
+                                plansToExecute.get(0).setJumpInformation("facingLeft");
                                 addPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.ATTACK_DOWN));
                             }
                         }
@@ -432,11 +441,13 @@ public class AI extends Fighter
                 if(!facingLeft)
                 {
                     resetAndAddPlanToArray(getPlan(FighterMovementState.JUMPING, FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
+                    plansToExecute.get(0).setJumpInformation("facingRight");
                     addPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.ATTACK_DOWN));
                 }
                 else
                 {
                     resetAndAddPlanToArray(getPlan(FighterMovementState.JUMPING, FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
+                    plansToExecute.get(0).setJumpInformation("facingLeft");
                     addPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.ATTACK_DOWN));
                 }
 
@@ -447,10 +458,12 @@ public class AI extends Fighter
                 if(!facingLeft)
                 {
                     resetAndAddPlanToArray(getPlan(FighterMovementState.JUMPING, FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
+                    plansToExecute.get(0).setJumpInformation("facingRight");
                 }
                 else
                 {
                     resetAndAddPlanToArray(getPlan(FighterMovementState.JUMPING, FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
+                    plansToExecute.get(0).setJumpInformation("facingLeft");
                 }
             }
             else

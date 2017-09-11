@@ -18,8 +18,8 @@ public class GameValues
     public static final String GAME_PRE_MATCH_STRING = "Fight!";
     public static final String GAME_POST_MATCH_STRING = "K.O.";
 
-    public static final float GAME_ACCELEROMETER_X_MIN_SPEED = 2f;
-    public static final float GAME_ACCELEROMETER_Y_MIN_SPEED = 2f;
+    public static final float GAME_ACCELEROMETER_X_MIN_SPEED = 11f;
+    public static final float GAME_ACCELEROMETER_Y_MIN_SPEED = 11f;
 
     //Fighter
     public static final int FIGHTER_HEALTH = 100;
