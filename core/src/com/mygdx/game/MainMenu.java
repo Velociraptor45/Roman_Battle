@@ -1,8 +1,10 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -21,6 +23,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 
+import Constants.GameValues;
+
 
 /**
  * Created by AboutWhiteR on 12.08.2017.
@@ -36,6 +40,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 public class MainMenu implements Screen, InputProcessor {
     //do we need to get the spriteBatch
     private MainClass mainClass;
+    GameClass game;
 
     private Stage menuStage;
     private Table menuStartButtonTable, menuTopButtonsTable;
@@ -43,6 +48,9 @@ public class MainMenu implements Screen, InputProcessor {
     private TextButton menuStartButton, menuTutorialButton;
     private Button menuSettingsButton;
 
+    ///File
+    private int maxWonGames;
+    private int currentlyWonGames;
 
    // we need the MainClass Objekt to access the SpriteBatch
    public MainMenu(MainClass mainClass){
@@ -78,6 +86,11 @@ public class MainMenu implements Screen, InputProcessor {
         menuTopButtonsTable.debug();
         menuStage.addActor(menuStartButtonTable);
         menuStage.addActor(menuTopButtonsTable);
+
+        maxWonGames = 0;
+        currentlyWonGames = 0;
+        readFile();
+        game = new GameClass(mainClass, maxWonGames, currentlyWonGames);
     }
 
     private void setupStartButton()
@@ -98,7 +111,8 @@ public class MainMenu implements Screen, InputProcessor {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                mainClass.setScreen(new GameClass(mainClass));
+                game = new GameClass(mainClass, maxWonGames, currentlyWonGames);
+                mainClass.setScreen(game);
             }
         });
 
@@ -160,11 +174,55 @@ public class MainMenu implements Screen, InputProcessor {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        maxWonGames = game.getMaxWonGames();
+        currentlyWonGames = game.getCurrentlyWonGames();
+
         menuStage.act(delta);
         menuStage.draw();
+    }
 
-        /*mainClass.getSpriteBatch().begin();
-        mainClass.getSpriteBatch().end();*/
+
+    ////////////File
+    private void readFile()
+    {
+        if(Gdx.files.isLocalStorageAvailable())
+        {
+            FileHandle fileHandle = Gdx.files.local("data/scores.txt");
+            if(Gdx.files.local("data/scores.txt").exists())
+            {
+                String content = fileHandle.readString();
+                stringToInt(content);
+            }
+        }
+    }
+
+    /*
+        converts the string from the file into int and sets maxWonGames and currentlyWonGames
+     */
+    private void stringToInt(String string)
+    {
+        char[] charArray = string.toCharArray();
+        boolean firstPart = true;
+        String maxWon = "";
+        String currentlyWon = "";
+        for(int i = 0;i < charArray.length; i++)
+        {
+            if(charArray[i] == ' ')
+            {
+                firstPart = false;
+            }
+            else if(firstPart)
+            {
+                maxWon += charArray[i];
+            }
+            else
+            {
+                currentlyWon += charArray[i];
+            }
+        }
+
+        maxWonGames = Integer.parseInt(maxWon);
+        currentlyWonGames = Integer.parseInt(currentlyWon);
     }
 
 

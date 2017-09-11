@@ -13,7 +13,6 @@ public class MainClass extends Game  {
     //is always used in the render-methods of each class
     private SpriteBatch spriteBatch;
 
-
     @Override
     public void create() {
         spriteBatch = new SpriteBatch();

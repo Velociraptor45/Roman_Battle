@@ -1,8 +1,8 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -24,7 +24,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.sun.org.apache.bcel.internal.generic.FLOAD;
 
 import Constants.GameValues;
 import Fighter.Fighter;
@@ -39,7 +38,8 @@ import Fighter.TestGround;
 // This class represents the GameScreen where the Game is played
 // Here are control elements, player, enemy....
 
-public class GameClass implements Screen, GestureDetector.GestureListener {
+public class GameClass implements Screen, GestureDetector.GestureListener
+{
     private MainClass mainClass;
     private Player player;
     private AI ai;
@@ -67,10 +67,14 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
     private boolean duck = false;
     private boolean attack = false;
     private boolean block = false;
-   //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    private int maxWonGames;
+    private int currentlyWonGames;
+
 
     // we need the MainClass Objekt to access the SpriteBatch
-    public GameClass(MainClass mainClass){
+    public GameClass(MainClass mainClass, int maxWon, int curWon)
+    {
         this.mainClass = mainClass;
 
         atlasAI = new TextureAtlas(Gdx.files.internal("fighter/AI.pack"));//TODO NEWWWWWWWWWWW 1
@@ -88,6 +92,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         gameStartTimer = 0;
         postMatchString = GameValues.GAME_POST_MATCH_STRING;
         preMatchString = GameValues.GAME_PRE_MATCH_STRING;
+
+        maxWonGames = maxWon;
+        currentlyWonGames = curWon;
     }
 
     //this is like the create() method
@@ -97,7 +104,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         setup();
     }
 
-    private void setup() {
+    private void setup()
+    {
 
         gameStage = new Stage();
         Gdx.input.setInputProcessor(gameStage);
@@ -105,7 +113,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         movementButtonsTable = new Table();
         jbaButtonsTable = new Table();
         movementButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        jbaButtonsTable.setBounds(0, 0 , Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        jbaButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         textFieldTable = new Table();
         textFieldTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -175,7 +183,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
         buttonLeft = new Button(leftStyle);
 
-        buttonLeft.addListener(new ClickListener() {
+        buttonLeft.addListener(new ClickListener()
+        {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
             {
@@ -189,8 +198,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             {
                 Gdx.app.log("left", "false");
                 moveLeft = false;
-                if(!moveRight){
-                    standing=true;
+                if (!moveRight)
+                {
+                    standing = true;
                 }
             }
         });
@@ -211,7 +221,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
         buttonRight = new Button(rightStyle);
 
-        buttonRight.addListener(new ClickListener() {
+        buttonRight.addListener(new ClickListener()
+        {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
             {
@@ -227,8 +238,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
                 moveRight = false;
 
 
-                if(!moveLeft){
-                    standing=true;
+                if (!moveLeft)
+                {
+                    standing = true;
                 }
 
             }
@@ -249,7 +261,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         style.down = skin.getDrawable("arrowUp.up");
 
         buttonUp = new Button(style);
-        buttonUp.addListener(new ClickListener() {
+        buttonUp.addListener(new ClickListener()
+        {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
             {
@@ -278,15 +291,15 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         style.down = skin.getDrawable("arrowDown.up");
 
         buttonDown = new Button(style);
-        buttonDown.addListener(new ClickListener() {
+        buttonDown.addListener(new ClickListener()
+        {
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
             {
-                if(player.isOnGround())
+                if (player.isOnGround())
                 {
                     duck = true;
-                }
-                else
+                } else
                 {
                     attackDown = true;
                 }
@@ -319,7 +332,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         style.pressedOffsetY = -1;
 
         buttonAttack = new TextButton("A", style);
-        buttonAttack.addListener(new ClickListener() {
+        buttonAttack.addListener(new ClickListener()
+        {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
@@ -346,7 +360,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         style.pressedOffsetY = -1;
 
         buttonBlock = new TextButton("B", style);
-        buttonBlock.addListener(new ClickListener() {
+        buttonBlock.addListener(new ClickListener()
+        {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
@@ -354,10 +369,6 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             }
 
         });
-
-
-
-
 
 
         jbaButtonsTable.add(buttonBlock);
@@ -379,11 +390,12 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         style.pressedOffsetY = -1;
 
         buttonJump = new TextButton("J", style);
-        buttonJump.addListener(new ClickListener() {
+        buttonJump.addListener(new ClickListener()
+        {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                if(player.getY() <= GameValues.FIGHTER_ORIGINAL_HEIGHT)
+                if (player.getY() <= GameValues.FIGHTER_ORIGINAL_HEIGHT)
                 {
                     jump = true;
                 }
@@ -393,12 +405,15 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         jbaButtonsTable.add(buttonJump);
     }
 
+    /////////////////////////////////Setup end
+
     @Override
-    public void render(float delta) {
-        Gdx.gl.glClearColor(0,0,0,1);
+    public void render(float delta)
+    {
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if(gameIsRunning)
+        if (gameIsRunning)
         {
             //actual game is running
             player.updateFacingDirection(ai);
@@ -418,24 +433,21 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
             collision(player, ai);
 
             areFightersAlive();
-        }
-        else if(preMatchIsRunning)
+        } else if (preMatchIsRunning)
         {
             //pre match display is shown, game will start
             gameStartTimer += delta;
-            if(gameStartTimer >= GameValues.GAME_START_TIME)
+            if (gameStartTimer >= GameValues.GAME_START_TIME)
             {
                 startGame();
             }
-        }
-        else
+        } else
         {
             //at least one Fighter is K.O.
-            if(gameResetTimer >= GameValues.GAME_RESET_TIME)
+            if (gameResetTimer >= GameValues.GAME_RESET_TIME)
             {
                 reset();
-            }
-            else
+            } else
             {
                 gameResetTimer += delta;
             }
@@ -443,7 +455,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
 
         mainClass.getSpriteBatch().begin();
-        mainClass.getSpriteBatch().draw(player,player.getX(),player.getY());
+        mainClass.getSpriteBatch().draw(player, player.getX(), player.getY());
         mainClass.getSpriteBatch().draw(ai, ai.getX(), ai.getY());
         mainClass.getSpriteBatch().end();
 
@@ -481,41 +493,37 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         float accY = Gdx.input.getAccelerometerY();
         //Gdx.app.log("AccX", Float.toString(accX));
         //Gdx.app.log("AccY", Float.toString(accY));
-        if(Math.abs(accX) > GameValues.GAME_ACCELEROMETER_X_MIN_SPEED)
+        if (Math.abs(accX) > GameValues.GAME_ACCELEROMETER_X_MIN_SPEED)
         {
-            if(Math.abs(accY) > Math.abs(accX) && !attack && !block)
+            if (Math.abs(accY) > Math.abs(accX) && !attack && !block)
             {
                 //moved mobile phone faster in y-direction than in x-direction
                 //attack up or down
-                if(accY > 0 && !attackDown)
+                if (accY > 0 && !attackDown)
                 {
                     //attack up
                     attackUp = true;
-                }
-                else if(!player.isOnGround() && !attackUp)
+                } else if (!player.isOnGround() && !attackUp)
                 {
                     //attack down
                     attackDown = true;
                 }
-            }
-            else
+            } else
             {
                 //attack left/right
-                if(!attackUp && !attackDown && !block)
+                if (!attackUp && !attackDown && !block)
                 {
                     attack = true;
                 }
             }
-        }
-        else if(Math.abs(accY) > GameValues.GAME_ACCELEROMETER_Y_MIN_SPEED)
+        } else if (Math.abs(accY) > GameValues.GAME_ACCELEROMETER_Y_MIN_SPEED)
         {
-            if(!attack && !block)
+            if (!attack && !block)
             {
-                if(accY > 0 && !attackDown)
+                if (accY > 0 && !attackDown)
                 {
                     attackUp = true;
-                }
-                else if (!player.isOnGround() && !attackUp)
+                } else if (!player.isOnGround() && !attackUp)
                 {
                     attackDown = true;
                 }
@@ -528,22 +536,24 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
      */
     private void areFightersAlive()
     {
-        if(!player.isAlive())
+        if (!player.isAlive())
         {
-            if(!ai.isAlive())
+            if (!ai.isAlive())
             {
                 tie();
-            }
-            else
+            } else
             {
                 hasWon(ai);
+                currentlyWonGames = 0;
+                writeFile();
             }
             gameIsRunning = false;
             showPostMatchScreen();
-        }
-        else if(!ai.isAlive())
+        } else if (!ai.isAlive())
         {
             hasWon(player);
+            currentlyWonGames++;
+            writeFile();
             gameIsRunning = false;
             showPostMatchScreen();
         }
@@ -570,45 +580,39 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
      */
     private void collision(Player player, AI ai)
     {
-        if(Intersector.overlaps(player.getBoundingRectangle(), ai.getBoundingRectangle()))
+        if (Intersector.overlaps(player.getBoundingRectangle(), ai.getBoundingRectangle()))
         {
-            if(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.BLOCK || ai.getCurrentMovementState() == Fighter.FighterMovementState.DUCKING))
+            if (player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.BLOCK || ai.getCurrentMovementState() == Fighter.FighterMovementState.DUCKING))
             {
                 //player attacked nomal, ai couldn't block
                 ai.takeDamage(GameValues.PLAYER_DAMAGE);
                 ai.stun();
-            }
-            else if(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK && !(player.getCurrentFightingState() == Fighter.FighterFightingState.BLOCK || player.getCurrentMovementState() == Fighter.FighterMovementState.DUCKING))
+            } else if (ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK && !(player.getCurrentFightingState() == Fighter.FighterFightingState.BLOCK || player.getCurrentMovementState() == Fighter.FighterMovementState.DUCKING))
             {
                 //ai attacked normal, player couldn't block
                 player.takeDamage(GameValues.AI_DAMAGE);
                 player.stun();
-            }
-            else if(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP))
+            } else if (player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP))
             {
                 //player attacked from above
                 ai.takeDamage(GameValues.PLAYER_DAMAGE);
                 ai.stun();
-            }
-            else if(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN && !(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP))
+            } else if (ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN && !(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP))
             {
                 //ai attacked from above
                 player.takeDamage(GameValues.AI_DAMAGE);
                 player.stun();
-            }
-            else if(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN))
+            } else if (player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN))
             {
                 //player attacked from underneath
                 ai.takeDamage(GameValues.PLAYER_DAMAGE);
                 ai.stun();
-            }
-            else if(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP && !(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN))
+            } else if (ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP && !(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN))
             {
                 //ai attacked from underneath
                 player.takeDamage(GameValues.AI_DAMAGE);
                 player.stun();
-            }
-            else if((ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP || ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN || ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK) && (player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN || player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP || player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK))
+            } else if ((ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP || ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN || ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK) && (player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN || player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP || player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK))
             {
                 //both attacked at the same time
                 ai.takeDamage(GameValues.PLAYER_DAMAGE);
@@ -622,27 +626,23 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
     private void switchPlayerFightingState(float delta)
     {
-        if(attackUp && attack)
+        if (attackUp && attack)
         {
             attackUp = player.attackUp(delta);
             player.setFightingState(Player.FighterFightingState.ATTACK_UP);
-        }
-        else if(attackDown && attack)
+        } else if (attackDown && attack)
         {
             attackDown = player.attackDown(delta);
             player.setFightingState(Player.FighterFightingState.ATTACK_DOWN);
-        }
-        else if(attack)
+        } else if (attack)
         {
             attack = player.attack(delta);
             player.setFightingState(Player.FighterFightingState.ATTACK);
-        }
-        else if(block)
+        } else if (block)
         {
             block = player.block(delta);
             player.setFightingState(Player.FighterFightingState.BLOCK);
-        }
-        else
+        } else
         {
             player.setFightingState(Player.FighterFightingState.NONE);
         }
@@ -650,29 +650,28 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
 
     private void switchPlayerMovementState()
     {
-        if(duck)
+        if (duck)
         {
             player.setMovementState(Player.FighterMovementState.DUCKING);
-        }
-        else if(moveRight){
+        } else if (moveRight)
+        {
             player.moveRight(GameValues.PLAYER_MOVING_SPEED);
             player.setMovementState(Player.FighterMovementState.MOVINGRIGHT);
-        }
-        else if (moveLeft){
+        } else if (moveLeft)
+        {
             player.moveLeft(GameValues.PLAYER_MOVING_SPEED);
             player.setMovementState(Player.FighterMovementState.MOVINGLEFT);
-        }
-        else if(standing){
+        } else if (standing)
+        {
             player.setMovementState(Player.FighterMovementState.STANDING);
         }
 
-        if(jump && !duck)
+        if (jump && !duck)
         {
             Gdx.app.log("Player", "jump");
             player.setMovementState(Player.FighterMovementState.JUMPING);
             jump = player.jump();
-        }
-        else if(player.getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
+        } else if (player.getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
         {
             Gdx.app.log("Player", "fall");
             player.setMovementState(Player.FighterMovementState.JUMPING);
@@ -680,7 +679,44 @@ public class GameClass implements Screen, GestureDetector.GestureListener {
         }
     }
 
+    ////////////////////////////File
 
+    /*
+        writes the current highscore and the current amount of won games in a file
+        for permanent save
+     */
+    private void writeFile()
+    {
+        checkCurrentlyWonGames();
+        if(Gdx.files.isLocalStorageAvailable())
+        {
+            FileHandle fileHandle = Gdx.files.local("data/scores.txt");
+            fileHandle.writeString(Integer.toString(maxWonGames) + " " + Integer.toString(currentlyWonGames), false);
+        }
+    }
+
+    /*
+        checks if the amount of currently won games is higher than the old highscore
+     */
+    private void checkCurrentlyWonGames()
+    {
+        if(currentlyWonGames > maxWonGames)
+        {
+            maxWonGames = currentlyWonGames;
+        }
+    }
+
+    public int getMaxWonGames()
+    {
+        return maxWonGames;
+    }
+
+    public int getCurrentlyWonGames()
+    {
+        return currentlyWonGames;
+    }
+
+    ///////////////////////////////File end
 
     @Override
     public void resize(int width, int height) {
