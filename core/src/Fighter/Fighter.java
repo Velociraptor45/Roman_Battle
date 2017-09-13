@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import Constants.GameValues;
+
+import static Fighter.Fighter.FighterFightingState.ATTACK;
 import static Fighter.Fighter.FighterFightingState.NONE;
 
 public class Fighter extends Sprite
@@ -158,6 +160,10 @@ public class Fighter extends Sprite
 
     public void setFightingState(FighterFightingState state)
     {
+        if(fightingState == ATTACK && fightingState != state && facingLeft)
+        {
+            moveRight(GameValues.PLAYER_ATTACK_LEFT_SPEED);
+        }
         fightingState = state;
     }
 
@@ -206,7 +212,7 @@ public class Fighter extends Sprite
                 break;
             case ATTACK_DOWN:
                 if (facingLeft){
-                region = jumpKickLeft;
+                    region = jumpKickLeft;
                 }else {
                     region = jumpKick;
                 }
@@ -356,6 +362,8 @@ public class Fighter extends Sprite
         }
         else
         {
+            //Gdx.app.log("attack", "move back");
+            //moveRight(GameValues.PLAYER_ATTACK_LEFT_SPEED);
             attackTimer = 0f;
             return false;
         }
@@ -427,5 +435,10 @@ public class Fighter extends Sprite
     public void gameWon()
     {
         wonGames++;
+    }
+
+    public boolean isFacingLeft()
+    {
+        return facingLeft;
     }
 }

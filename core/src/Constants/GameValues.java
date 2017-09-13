@@ -24,7 +24,7 @@ public class GameValues
     //Fighter
     public static final int FIGHTER_HEALTH = 100;
 
-    public static final int FIGHTER_MAX_JUMP_HEIGHT = 400;
+    public static final int FIGHTER_MAX_JUMP_HEIGHT = 450;
     public static final int FIGHTER_ORIGINAL_HEIGHT = 150;
     public static final int PLAYER_ORIGINAL_X = 20;
     public static final int AI_ORIGINAL_X = 700;
@@ -32,6 +32,8 @@ public class GameValues
     public static final int AI_MOVING_SPEED_WHILE_ATTACK = 5;
     public static final int AI_MOVING_SPEED_DODGE = 7;
     public static final int PLAYER_MOVING_SPEED = 10;
+    //moves the player left because of bigger texture size while attacking left
+    public static final int PLAYER_ATTACK_LEFT_SPEED = 49;
 
     public static final int PLAYER_DAMAGE = 17;
     public static final int AI_DAMAGE = 17;

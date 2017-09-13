@@ -338,6 +338,10 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             public void clicked(InputEvent event, float x, float y)
             {
                 attack = true;
+                if(player.isFacingLeft())
+                {
+                    player.moveLeft(GameValues.PLAYER_ATTACK_LEFT_SPEED);
+                }
             }
         });
 
@@ -405,7 +409,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         jbaButtonsTable.add(buttonJump);
     }
 
-    /////////////////////////////////Setup end
+    /////////////////////////////////setup end
 
     @Override
     public void render(float delta)
@@ -419,16 +423,15 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             player.updateFacingDirection(ai);
             ai.updateFacingDirection(player);
 
-            player.update(delta);
-            ai.update(delta);
-
-
             ai.act(player, delta);
 
             checkAcceleration();
 
             switchPlayerMovementState();
             switchPlayerFightingState(delta);
+
+            player.update(delta);
+            ai.update(delta);
 
             collision(player, ai);
 
@@ -666,11 +669,17 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             player.setMovementState(Player.FighterMovementState.DUCKING);
         } else if (moveRight)
         {
-            player.moveRight(GameValues.PLAYER_MOVING_SPEED);
+            if(player.getX() + player.getRegionWidth() + GameValues.PLAYER_MOVING_SPEED < ai.getX() || player.isFacingLeft() || !player.isOnGround())
+            {
+                player.moveRight(GameValues.PLAYER_MOVING_SPEED);
+            }
             player.setMovementState(Player.FighterMovementState.MOVINGRIGHT);
         } else if (moveLeft)
         {
-            player.moveLeft(GameValues.PLAYER_MOVING_SPEED);
+            if(player.getX() - GameValues.PLAYER_MOVING_SPEED > ai.getX() + ai.getRegionWidth() || !player.isFacingLeft() || !player.isOnGround())
+            {
+                player.moveLeft(GameValues.PLAYER_MOVING_SPEED);
+            }
             player.setMovementState(Player.FighterMovementState.MOVINGLEFT);
         } else if (standing)
         {
