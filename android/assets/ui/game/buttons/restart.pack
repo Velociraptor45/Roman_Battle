@@ -1,19 +1,19 @@
 
-arrowUp.png
+restart.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-arrowUp.down
+restart.down
   rotate: false
   xy: 0, 0
-  size: 100, 98
-  orig: 100, 98
+  size: 200, 195
+  orig: 200, 195
   offset: 0, 0
   index: -1
-arrowUp.up
+restart.up
   rotate: false
-  xy: 100, 1
-  size: 100, 97
-  orig: 100, 97
+  xy: 200, 0
+  size: 200, 195
+  orig: 200, 195
   offset: 0, 0
   index: -1

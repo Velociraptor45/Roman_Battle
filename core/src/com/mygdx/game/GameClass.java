@@ -9,9 +9,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -19,10 +19,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import Constants.GameValues;
@@ -48,14 +48,13 @@ public class GameClass implements Screen, GestureDetector.GestureListener
 
 
     private Stage gameStage;
-    private Table movementButtonsTable, jbaButtonsTable, textFieldTable; //jba = jump block attack
+    private Table playerHealthTable, aiHealthTable, playerStatsTable, aiStatsTable, movementButtonsTable, jbaButtonsTable, prePostScreenTable; //jba = jump block attack
     private Button buttonLeft, buttonRight, buttonUp, buttonDown;
     private TextButton buttonAttack, buttonBlock, buttonJump;
-    private TextField textFieldPreMatch, textFieldPostMatch;
+    private Image preMatchImage, postMatchImage, postMatchImageKO, postMatchImageTIE, healthBarPlayer, healthBarAI, healthPlayer, healthAI;
 
     private boolean gameIsRunning, preMatchIsRunning;
     private float gameResetTimer, gameStartTimer;
-    private String postMatchString, preMatchString;
 
     ////////////////////////////////////////////////////////////////////////
     private boolean moveRight = false;
@@ -77,7 +76,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     {
         this.mainClass = mainClass;
 
-        atlasAI = new TextureAtlas(Gdx.files.internal("fighter/AI.pack"));//TODO NEWWWWWWWWWWW 1
+        atlasAI = new TextureAtlas(Gdx.files.internal("fighter/AI.pack"));
         atlasPlayer = new TextureAtlas((Gdx.files.internal("fighter/player.pack")));
 
         player = new Player(atlasPlayer, GameValues.PLAYER_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
@@ -86,12 +85,10 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         player.updateFacingDirection(ai);
         ai.updateFacingDirection(player);
 
-        gameIsRunning = true;
-        preMatchIsRunning = false;
+        gameIsRunning = false;
+        preMatchIsRunning = true;
         gameResetTimer = 0;
         gameStartTimer = 0;
-        postMatchString = GameValues.GAME_POST_MATCH_STRING;
-        preMatchString = GameValues.GAME_PRE_MATCH_STRING;
 
         maxWonGames = maxWon;
         currentlyWonGames = curWon;
@@ -106,7 +103,6 @@ public class GameClass implements Screen, GestureDetector.GestureListener
 
     private void setup()
     {
-
         gameStage = new Stage();
         Gdx.input.setInputProcessor(gameStage);
 
@@ -114,8 +110,25 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         jbaButtonsTable = new Table();
         movementButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         jbaButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        textFieldTable = new Table();
-        textFieldTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        prePostScreenTable = new Table();
+        prePostScreenTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        playerStatsTable = new Table();
+        playerStatsTable.setBounds(0, Gdx.graphics.getHeight() - 200, Gdx.graphics.getWidth(), 200);
+        playerStatsTable.left().top();
+
+        aiStatsTable = new Table();
+        aiStatsTable.setBounds(0, Gdx.graphics.getHeight() - 200, Gdx.graphics.getWidth(), 200);
+        aiStatsTable.right().top();
+
+        playerHealthTable = new Table();
+        playerHealthTable.setBounds(13, Gdx.graphics.getHeight() - 117, Gdx.graphics.getWidth(), 100);
+        playerHealthTable.left().top();
+
+        aiHealthTable = new Table();
+        aiHealthTable.setBounds(0, Gdx.graphics.getHeight() - 117, Gdx.graphics.getWidth() - 13, 100);
+        aiHealthTable.right().top();
 
         setupUpButton();
         movementButtonsTable.row();
@@ -129,45 +142,76 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         jbaButtonsTable.row();
         setupAttackButton();
 
-        setupPreMatchTextField();
-        setupPostMatchTextField();
+        setupPreMatchImage();
+        setupPostMatchImage();
 
-        textFieldTable.center();
+        prePostScreenTable.center();
         movementButtonsTable.bottom().left();
         jbaButtonsTable.bottom().right();
 
-        textFieldTable.debug();
+        setupHealthBars();
+        setupHealth();
+
+        prePostScreenTable.debug();
         movementButtonsTable.debug();
         jbaButtonsTable.debug();
-        gameStage.addActor(textFieldTable);
+        //playerStatsTable.debug();
+        //aiStatsTable.debug();
+        gameStage.addActor(prePostScreenTable);
         gameStage.addActor(movementButtonsTable);
         gameStage.addActor(jbaButtonsTable);
+        gameStage.addActor(playerHealthTable);
+        gameStage.addActor(aiHealthTable);
+        gameStage.addActor(playerStatsTable);
+        gameStage.addActor(aiStatsTable);
     }
 
-    private void setupPreMatchTextField()
+    private void setupHealthBars()
     {
-        /*FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/arial.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 24;
-        BitmapFont font = generator.generateFont(parameter);
-        generator.dispose();*/
+        TextureAtlas atlas = new TextureAtlas("ui/game/healthbar/healthbar.pack");
 
-        TextField.TextFieldStyle style = new TextField.TextFieldStyle();
-        style.font = new BitmapFont();
-        style.fontColor = Color.WHITE;
+        Skin skin = new Skin(atlas);
 
-        textFieldPreMatch = new TextField(preMatchString, style);
+        healthBarAI = new Image(skin, "healthbar.up");
+        healthBarPlayer = new Image(skin, "healthbar.up");
 
-        //textFieldTable.add(textFieldPreMatch);
+        playerStatsTable.add(healthBarPlayer);
+        aiStatsTable.add(healthBarAI);
     }
 
-    private void setupPostMatchTextField()
+    private void setupHealth()
     {
-        TextField.TextFieldStyle style = new TextField.TextFieldStyle();
-        style.font = new BitmapFont();
-        style.fontColor = Color.WHITE;
+        TextureAtlas atlas = new TextureAtlas("ui/game/healthbar/health.pack");
 
-        textFieldPostMatch = new TextField(postMatchString, style);
+        Skin skin = new Skin(atlas);
+
+        healthPlayer = new Image(skin, "health.up");
+        healthAI = new Image(skin, "health.up");
+        healthAI.setOrigin(280, 0);
+
+        playerHealthTable.add(healthPlayer);
+        aiHealthTable.add(healthAI);
+    }
+
+    private void setupPreMatchImage()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/game/screen_images/preScreen.pack");
+
+        Skin skin = new Skin(atlas);
+
+        preMatchImage = new Image(skin, "preScreen.up");
+
+        prePostScreenTable.add(preMatchImage);
+    }
+
+    private void setupPostMatchImage()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/game/screen_images/postScreen.pack");
+
+        Skin skin = new Skin(atlas);
+
+        postMatchImageKO = new Image(skin, "postScreenKO.up");
+        postMatchImageTIE = new Image(skin, "postScreenTIE.up");
     }
 
     private void setupLeftButton()
@@ -178,8 +222,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener
 
         Button.ButtonStyle leftStyle = new Button.ButtonStyle();
 
-        leftStyle.up = leftButtonSkin.getDrawable("arrowRight.up");
-        leftStyle.down = leftButtonSkin.getDrawable("arrowRight.up");
+        leftStyle.up = leftButtonSkin.getDrawable("arrowLeft.up");
+        leftStyle.down = leftButtonSkin.getDrawable("arrowLeft.down");
 
         buttonLeft = new Button(leftStyle);
 
@@ -217,7 +261,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         Button.ButtonStyle rightStyle = new Button.ButtonStyle();
 
         rightStyle.up = rightButtonSkin.getDrawable("arrowRight.up");
-        rightStyle.down = rightButtonSkin.getDrawable("arrowRight.up");
+        rightStyle.down = rightButtonSkin.getDrawable("arrowRight.down");
 
         buttonRight = new Button(rightStyle);
 
@@ -258,7 +302,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         Button.ButtonStyle style = new Button.ButtonStyle();
 
         style.up = skin.getDrawable("arrowUp.up");
-        style.down = skin.getDrawable("arrowUp.up");
+        style.down = skin.getDrawable("arrowUp.down");
 
         buttonUp = new Button(style);
         buttonUp.addListener(new ClickListener()
@@ -288,7 +332,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         Button.ButtonStyle style = new Button.ButtonStyle();
 
         style.up = skin.getDrawable("arrowDown.up");
-        style.down = skin.getDrawable("arrowDown.up");
+        style.down = skin.getDrawable("arrowDown.down");
 
         buttonDown = new Button(style);
         buttonDown.addListener(new ClickListener()
@@ -411,6 +455,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
 
     /////////////////////////////////setup end
 
+    //main method
     @Override
     public void render(float delta)
     {
@@ -430,9 +475,6 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             switchPlayerMovementState();
             switchPlayerFightingState(delta);
 
-            player.update(delta);
-            ai.update(delta);
-
             collision(player, ai);
 
             areFightersAlive();
@@ -450,12 +492,15 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             if (gameResetTimer >= GameValues.GAME_RESET_TIME)
             {
                 reset();
-            } else
+            }
+            else
             {
                 gameResetTimer += delta;
             }
         }
 
+        player.update(delta);
+        ai.update(delta);
 
         mainClass.getSpriteBatch().begin();
         mainClass.getSpriteBatch().draw(player, player.getX(), player.getY());
@@ -473,11 +518,14 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         preMatchIsRunning = true;
         gameResetTimer = 0;
         gameStartTimer = 0;
-        textFieldTable.clearChildren();
-        textFieldPostMatch.setText(GameValues.GAME_POST_MATCH_STRING);
+        prePostScreenTable.clearChildren();
+        prePostScreenTable.add(preMatchImage);
 
         player = new Player(atlasPlayer, GameValues.PLAYER_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
         ai = new AI(0, atlasAI, GameValues.AI_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+
+        healthPlayer.setScaleX(1f);
+        healthAI.setScaleX(1f);
 
         player.updateFacingDirection(ai);
         ai.updateFacingDirection(player);
@@ -487,10 +535,10 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     {
         gameIsRunning = true;
         preMatchIsRunning = false;
-        textFieldTable.clearChildren();
+        prePostScreenTable.clearChildren();
     }
 
-    private void checkAcceleration()
+    private void checkAcceleration() //TODO fix facDir
     {
         float accY = Gdx.input.getAccelerometerX();
         float accX = Gdx.input.getAccelerometerY();
@@ -555,6 +603,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
                 tie();
             } else
             {
+                KO();
                 hasWon(ai);
                 currentlyWonGames = 0;
                 writeFile();
@@ -563,12 +612,24 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             showPostMatchScreen();
         } else if (!ai.isAlive())
         {
+            KO();
             hasWon(player);
             currentlyWonGames++;
             writeFile();
             gameIsRunning = false;
             showPostMatchScreen();
         }
+    }
+
+    private void checkHealth()
+    {
+        float health = player.getHealth();
+        health /= 100;
+        healthPlayer.setScaleX(health);
+
+        health = ai.getHealth();
+        health /= 100;
+        healthAI.setScaleX(health);
     }
 
     private void hasWon(Fighter winner)
@@ -578,12 +639,17 @@ public class GameClass implements Screen, GestureDetector.GestureListener
 
     private void tie()
     {
-        textFieldPostMatch.setText("TIE");
+        postMatchImage = postMatchImageTIE;
+    }
+
+    private void KO()
+    {
+        postMatchImage = postMatchImageKO;
     }
 
     private void showPostMatchScreen()
     {
-        textFieldTable.add(textFieldPostMatch);
+        prePostScreenTable.add(postMatchImage);
     }
 
 
@@ -592,7 +658,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
      */
     private void collision(Player player, AI ai)
     {
-        if (Intersector.overlaps(player.getBoundingRectangle(), ai.getBoundingRectangle()))
+        if (Intersector.overlaps(player.getRectangle(), ai.getRectangle()))
         {
             if (player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.BLOCK || ai.getCurrentMovementState() == Fighter.FighterMovementState.DUCKING))
             {
@@ -633,6 +699,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
                 ai.stun();
                 player.stun();
             }
+            checkHealth();
         }
     }
 
@@ -669,19 +736,21 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             player.setMovementState(Player.FighterMovementState.DUCKING);
         } else if (moveRight)
         {
-            if(player.getX() + player.getRegionWidth() + GameValues.PLAYER_MOVING_SPEED < ai.getX() || player.isFacingLeft() || !player.isOnGround())
+            if(player.getX() + player.getRegionWidth() + GameValues.PLAYER_MOVING_SPEED < ai.getX() || player.isFacingLeft() || !player.isOnGround() || !ai.isOnGround())
             {
                 player.moveRight(GameValues.PLAYER_MOVING_SPEED);
             }
             player.setMovementState(Player.FighterMovementState.MOVINGRIGHT);
-        } else if (moveLeft)
+        }
+        else if (moveLeft)
         {
-            if(player.getX() - GameValues.PLAYER_MOVING_SPEED > ai.getX() + ai.getRegionWidth() || !player.isFacingLeft() || !player.isOnGround())
+            if(player.getX() - GameValues.PLAYER_MOVING_SPEED > ai.getX() + ai.getRegionWidth() || !player.isFacingLeft() || !player.isOnGround() || !ai.isOnGround())
             {
                 player.moveLeft(GameValues.PLAYER_MOVING_SPEED);
             }
             player.setMovementState(Player.FighterMovementState.MOVINGLEFT);
-        } else if (standing)
+        }
+        else if (standing)
         {
             player.setMovementState(Player.FighterMovementState.STANDING);
         }
@@ -691,7 +760,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             Gdx.app.log("Player", "jump");
             player.setMovementState(Player.FighterMovementState.JUMPING);
             jump = player.jump();
-        } else if (player.getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
+        }
+        else if (player.getY() > GameValues.FIGHTER_ORIGINAL_HEIGHT)
         {
             Gdx.app.log("Player", "fall");
             player.setMovementState(Player.FighterMovementState.JUMPING);

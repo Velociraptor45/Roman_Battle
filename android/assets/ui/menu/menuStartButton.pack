@@ -5,15 +5,15 @@ filter: Nearest,Nearest
 repeat: none
 menuStartButton.down
   rotate: false
-  xy: 0, 0
-  size: 144, 72
-  orig: 144, 72
+  xy: 0, 108
+  size: 400, 108
+  orig: 400, 108
   offset: 0, 0
   index: -1
 menuStartButton.up
   rotate: false
-  xy: 144, 0
-  size: 144, 72
-  orig: 144, 72
+  xy: 0, 0
+  size: 400, 108
+  orig: 400, 108
   offset: 0, 0
   index: -1

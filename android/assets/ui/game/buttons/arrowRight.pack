@@ -3,10 +3,17 @@ arrowRight.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+arrowRight.down
+  rotate: false
+  xy: 0, 0
+  size: 100, 98
+  orig: 100, 98
+  offset: 0, 0
+  index: -1
 arrowRight.up
   rotate: false
-  xy: 1, 1
-  size: 60, 60
-  orig: 60, 60
+  xy: 100, 0
+  size: 100, 98
+  orig: 100, 98
   offset: 0, 0
   index: -1

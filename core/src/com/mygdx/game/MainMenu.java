@@ -45,8 +45,8 @@ public class MainMenu implements Screen, InputProcessor {
     private Stage menuStage;
     private Table menuStartButtonTable, menuTopButtonsTable;
 
-    private TextButton menuStartButton, menuTutorialButton;
-    private Button menuSettingsButton;
+    private TextButton menuTutorialButton;
+    private Button menuSettingsButton, menuStartButton;
 
     ///File
     private int maxWonGames;
@@ -95,18 +95,16 @@ public class MainMenu implements Screen, InputProcessor {
 
     private void setupStartButton()
     {
-        TextureAtlas menuStartButtonAtlas = new TextureAtlas("ui/menu/menuStartButton.pack"); //TODO neue Grafik für Buttons
+        TextureAtlas menuStartButtonAtlas = new TextureAtlas("ui/menu/menuStartButton.pack");
         Skin menuStartButtonSkin = new Skin(menuStartButtonAtlas);
 
-        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        Button.ButtonStyle style = new Button.ButtonStyle();
         style.up = menuStartButtonSkin.getDrawable("menuStartButton.up");
         style.down = menuStartButtonSkin.getDrawable("menuStartButton.down");
-        style.font = new BitmapFont(false); //TODO richtige Schriftart auswählen und über Bitmap setzen
-        style.fontColor = Color.BLACK;
         style.pressedOffsetX = 1;
         style.pressedOffsetY = -1;
 
-        menuStartButton = new TextButton("Start", style);
+        menuStartButton = new Button(style);
         menuStartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y)
@@ -169,8 +167,6 @@ public class MainMenu implements Screen, InputProcessor {
 
     @Override
     public void render(float delta) {
-        //before render clear display --> bin mir nicht sicher ob man das wirklich braucht hab ich nur wo gelesen aber
-        // keine Begründung und auch noch nicht nachgelesen
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 

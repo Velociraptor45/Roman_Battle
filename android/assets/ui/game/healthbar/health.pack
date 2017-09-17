@@ -1,0 +1,12 @@
+
+health.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+health.up
+  rotate: false
+  xy: 0, 0
+  size: 280, 35
+  orig: 280, 35
+  offset: 0, 0
+  index: -1

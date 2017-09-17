@@ -1,19 +1,19 @@
 
-arrowUp.png
+postScreen.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-arrowUp.down
+postScreenKO.up
   rotate: false
-  xy: 0, 0
-  size: 100, 98
-  orig: 100, 98
+  xy: 0, 200
+  size: 641, 200
+  orig: 641, 200
   offset: 0, 0
   index: -1
-arrowUp.up
+postScreenTIE.up
   rotate: false
-  xy: 100, 1
-  size: 100, 97
-  orig: 100, 97
+  xy: 0, 0
+  size: 580, 200
+  orig: 580, 200
   offset: 0, 0
   index: -1

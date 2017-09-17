@@ -8,15 +8,13 @@ import com.badlogic.gdx.Gdx;
 
 public class GameValues
 {
-    public static final double DENSTIY = Gdx.graphics.getDensity();
+    public static final double DENSITY = Gdx.graphics.getDensity();
             //160dpi: DENSITY = 1
             //120dpi: DENSITY = 0.75 -> compare graphics api
 
     //Game
     public static final float GAME_RESET_TIME = 2f;
     public static final float GAME_START_TIME = 2f;
-    public static final String GAME_PRE_MATCH_STRING = "Fight!";
-    public static final String GAME_POST_MATCH_STRING = "K.O.";
 
     public static final float GAME_ACCELEROMETER_X_MIN_SPEED = 11f;
     public static final float GAME_ACCELEROMETER_Y_MIN_SPEED = 11f;
@@ -25,17 +23,17 @@ public class GameValues
     public static final int FIGHTER_HEALTH = 100;
 
     public static final int FIGHTER_MAX_JUMP_HEIGHT = 450;
-    public static final int FIGHTER_ORIGINAL_HEIGHT = 150;
-    public static final int PLAYER_ORIGINAL_X = 20;
-    public static final int AI_ORIGINAL_X = 700;
-    public static final int AI_MOVING_SPEED = 3;
+    public static final int FIGHTER_ORIGINAL_HEIGHT = 200;
+    public static final int PLAYER_ORIGINAL_X = 0;
+    public static final int AI_ORIGINAL_X = Gdx.graphics.getWidth() - 150;
+    public static final int AI_MOVING_SPEED = 5;
     public static final int AI_MOVING_SPEED_WHILE_ATTACK = 5;
     public static final int AI_MOVING_SPEED_DODGE = 7;
     public static final int PLAYER_MOVING_SPEED = 10;
     //moves the player left because of bigger texture size while attacking left
     public static final int PLAYER_ATTACK_LEFT_SPEED = 49;
 
-    public static final int PLAYER_DAMAGE = 17;
+    public static final int PLAYER_DAMAGE = 60;
     public static final int AI_DAMAGE = 17;
 
     public static final float FIGHTER_ATTACK_DURATION = 0.2f;
@@ -78,16 +76,16 @@ public class GameValues
     //how long the ai goes in one direction before changing the direction
     public static final float AI_STANDARD_MOVE_CHANGE_TIME = 0.5f;
 
-    public static final int AI_MIN_TIME_STANDARD_MOVE = 3;
-    public static final int AI_MIN_TIME_MOVING_IN_DIRECTION = 2;
-    public static final float AI_MIN_STANDING_TIME = 1.3f;
+    public static final int AI_MIN_TIME_STANDARD_MOVE = 2;
+    public static final float AI_MIN_TIME_MOVING_IN_DIRECTION = 1.5f;
+    public static final float AI_MIN_STANDING_TIME = 1f;
 
     public static final int AI_MAX_PLAN_EXECUTION_TIME = 5;
 
     //border between far and medium distance
-    public static final int AI_START_FIGHTING_DISTANCE = 100;
+    public static final int AI_START_FIGHTING_DISTANCE = 150;
     //border between medium and close distance
-    public static final int AI_START_ATTCKING_DISTANCE = 40;
+    public static final int AI_START_ATTCKING_DISTANCE = 60;
 
-    public static final int AI_TIMER_ATTACK = 3;
+    public static final int AI_TIMER_ATTACK = 2;
 }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import Constants.GameValues;
 
@@ -49,7 +50,7 @@ public class Fighter extends Sprite
     protected FighterMovementState previousMovementState;
 
 
-    protected float stateTimer, blockTimer, attackTimer, attackUpTimer, attackDownTimer;
+    protected float stateTimer, blockTimer, attackTimer, attackUpTimer, attackDownTimer, takeDamageTimer;
 
     protected short wonGames = 0;
 
@@ -68,6 +69,7 @@ public class Fighter extends Sprite
         attackTimer = 0f;
         attackDownTimer = 0f;
         attackUpTimer = 0f;
+        takeDamageTimer = GameValues.FIGHTER_ATTACK_DURATION;
         wonGames = 0;
 
 
@@ -169,6 +171,11 @@ public class Fighter extends Sprite
 
     public void update(float delta){
         setRegion(getFrame(delta));
+
+        if(takeDamageTimer <= GameValues.FIGHTER_ATTACK_DURATION)
+        {
+            takeDamageTimer += delta;
+        }
     }
 
 
@@ -275,9 +282,7 @@ public class Fighter extends Sprite
                 break;
         }
 
-
         return region;
-
     }
 
 
@@ -409,7 +414,23 @@ public class Fighter extends Sprite
 
     public void takeDamage(int damage)
     {
-        HP -= damage;
+        if(takeDamageTimer >= GameValues.FIGHTER_ATTACK_DURATION)
+        {
+            HP -= damage;
+            takeDamageTimer = 0;
+        }
+    }
+
+    public int getHealth()
+    {
+        if(HP > 0)
+        {
+            return HP;
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     public void updateFacingDirection(Fighter fighter)
@@ -440,5 +461,12 @@ public class Fighter extends Sprite
     public boolean isFacingLeft()
     {
         return facingLeft;
+    }
+
+    public Rectangle getRectangle()
+    {
+        Rectangle r = new Rectangle();
+        r.set(getX(), getY(), getRegionWidth(), getRegionHeight());
+        return r;
     }
 }
