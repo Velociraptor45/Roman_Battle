@@ -51,14 +51,14 @@ public class AI extends Fighter
                 calculatePlanForCurrentSituation(player, getDistanceToPlayer(player));
             }
         }
-        if(!plansToExecute.isEmpty())
+
+        //makes sure that plansToExecute is never empty -> prevent NullPointerException
+        if(plansToExecute.isEmpty())
         {
-            updateCurrentStates(plansToExecute.get(0));
+            plansToExecute.add(getPlan(FighterMovementState.STANDING, FighterFightingState.NONE));
         }
-        else
-        {
-            updateCurrentStates(getPlan(FighterMovementState.STANDING, FighterFightingState.NONE));
-        }
+
+        updateCurrentStates(plansToExecute.get(0));
 
         executePlan(getDistanceToPlayer(player), player, delta);
     }
@@ -84,13 +84,14 @@ public class AI extends Fighter
                     if(plansToExecute.isEmpty() || plansToExecute.get(0).isSecondMovementEnabled() || (plansToExecute.get(0).getMovement() != FighterMovementState.MOVINGLEFT || plansToExecute.get(0).getMovement() != FighterMovementState.MOVINGRIGHT))
                     if (shouldExecute(GameValues.AI_DODGE_ATTACK_FROM_ABOVE_CHANCE))
                     {
-                        if (!facingLeft)
+                        resetAndAddPlanToArray(getPlan(FighterMovementState.DUCKING, FighterFightingState.NONE));
+                        /*if (!facingLeft)
                         {
                             resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGRIGHT, FighterFightingState.NONE));
                         } else
                         {
                             resetAndAddPlanToArray(getPlan(FighterMovementState.MOVINGLEFT, FighterFightingState.NONE));
-                        }
+                        }*/
                         return true;
                     }
                     tryDodgeForAttackDownTimer = 0;
@@ -475,12 +476,10 @@ public class AI extends Fighter
         //Gdx.app.log("New Plan", plansToExecute.get(0).getMovement().toString() + " " + plansToExecute.get(0).getSecondMovement() + " " + plansToExecute.get(0).getFighting().toString() + " " + getDistanceToPlayer(player));
     }
 
-    private boolean canBeExecuted(Player player, Plan plan)
-    {
-        //kann aktuelle Anweisung so überhaupt ausgeführt werden?
-        return true;
-    }
-
+    /**
+        @param chance: chance between 0 and 100 that a action is executed;
+        gambles depending on the chance whether a action should be executed
+     */
     private boolean shouldExecute(int chance)
     {
         Random r = new Random();
@@ -488,8 +487,8 @@ public class AI extends Fighter
         return (a < chance);
     }
 
-
-    /*
+    /**
+       @param delta: time since last frame
         depending on the current movement and fighting state of the ai this method executes
          the movement
      */
@@ -550,7 +549,7 @@ public class AI extends Fighter
                     }
                     else if (!(fightingState == FighterFightingState.ATTACK || fightingState == FighterFightingState.ATTACK_DOWN || fightingState == FighterFightingState.ATTACK_UP))
                     {
-                        if ( facingLeft)
+                        if (facingLeft)
                         {
                             if (distanceToPlayer - GameValues.AI_MOVING_SPEED > 0)
                             {
@@ -564,7 +563,7 @@ public class AI extends Fighter
                         }
                     } else
                     {
-                        if ( facingLeft)
+                        if (facingLeft)
                         {
                             if (distanceToPlayer - GameValues.AI_MOVING_SPEED_WHILE_ATTACK >= -GameValues.AI_MOVING_SPEED_WHILE_ATTACK)
                             {
@@ -585,7 +584,7 @@ public class AI extends Fighter
                     }
                     break;
                 case DUCKING:
-                    duck();
+                    //duck();
                     break;
                 default:
                     //Gdx.app.log("executePlan", "not right state for execution");
@@ -596,26 +595,16 @@ public class AI extends Fighter
         switch(fightingState)
         {
             case ATTACK:
-                attack(delta);
-                //Gdx.app.log("Fight", "Attack!");
+                plansToExecute.get(0).setExecuted(!attack(delta));
                 break;
             case ATTACK_DOWN:
-                attackDown(delta);
+                plansToExecute.get(0).setExecuted(!attackDown(delta));
                 break;
             case ATTACK_UP:
-                attackUp(delta);
+                plansToExecute.get(0).setExecuted(!attackUp(delta));
                 break;
             case BLOCK:
-                if(!block(delta))
-                {
-                    if(!plansToExecute.isEmpty())
-                    {
-                        terminate(plansToExecute.get(0));
-                    }
-                }
-                break;
-            case NONE:
-
+                plansToExecute.get(0).setExecuted(!block(delta));
                 break;
             default:
                 break;
@@ -630,6 +619,9 @@ public class AI extends Fighter
         }
     }
 
+    /*
+        checks for already executed plans and deletes them from plansToExecute
+     */
     private void checkForExecutedPlans()
     {
         for(int i = 0; i < plansToExecute.size(); i++)

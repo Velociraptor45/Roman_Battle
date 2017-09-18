@@ -13,7 +13,7 @@ public class Plan
     private Fighter.FighterMovementState movement;
     private Fighter.FighterMovementState secondMovement;
     private Fighter.FighterFightingState fighting;
-    private float durationMovementChange, durationPlanExecution, durationOfAttack;
+    private float durationMovementChange, durationPlanExecution;
 
 
     public Plan()
@@ -23,7 +23,6 @@ public class Plan
         originalFacingDirection = "";
         durationMovementChange = 0;
         durationPlanExecution = 0;
-        durationOfAttack = 0;
     }
 
     public Plan (Fighter.FighterMovementState move, Fighter.FighterFightingState fight)
@@ -77,17 +76,12 @@ public class Plan
 
     public void addDuration(float delta)
     {
-        if(durationPlanExecution >= GameValues.AI_MAX_PLAN_EXECUTION_TIME || durationOfAttack >= GameValues.FIGHTER_ATTACK_DURATION)
+        if(durationPlanExecution >= GameValues.AI_MAX_PLAN_EXECUTION_TIME)
         {
             setExecuted(true);
         }
         durationMovementChange += delta;
         durationPlanExecution += delta;
-
-        if(fighting == Fighter.FighterFightingState.ATTACK || fighting == Fighter.FighterFightingState.ATTACK_DOWN || fighting == Fighter.FighterFightingState.ATTACK_UP)
-        {
-            durationOfAttack += delta;
-        }
 
         if(isSecondMovementEnabled() && (durationMovementChange >= GameValues.AI_STANDARD_MOVE_CHANGE_TIME) && (movement != Fighter.FighterMovementState.JUMPING))
         {

@@ -3,18 +3,11 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -22,14 +15,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import Constants.GameValues;
 import Fighter.Fighter;
 import Fighter.Player;
 import Fighter.AI;
-import Fighter.TestGround;
 
 /**
  * Created by david on 12.08.2017.
@@ -46,14 +37,12 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     private TextureAtlas atlasAI;
     private TextureAtlas atlasPlayer;
 
-
     private Stage gameStage;
-    private Table playerHealthTable, aiHealthTable, playerStatsTable, aiStatsTable, movementButtonsTable, jbaButtonsTable, prePostScreenTable; //jba = jump block attack
-    private Button buttonLeft, buttonRight, buttonUp, buttonDown;
-    private TextButton buttonAttack, buttonBlock, buttonJump;
+    private Table playerWonGamesTable, aiWonGamesTable, playerHealthTable, aiHealthTable, playerStatsTable, aiStatsTable, movementButtonsTable, jbaButtonsTable, prePostScreenTable; //jba = jump block attack
+    private Button buttonLeft, buttonRight, buttonUp, buttonDown, buttonAttack, buttonBlock, buttonJump, buttonPause;
     private Image preMatchImage, postMatchImage, postMatchImageKO, postMatchImageTIE, healthBarPlayer, healthBarAI, healthPlayer, healthAI;
 
-    private boolean gameIsRunning, preMatchIsRunning;
+    private boolean gameIsRunning, preMatchIsRunning, gameIsPaused;
     private float gameResetTimer, gameStartTimer;
 
     ////////////////////////////////////////////////////////////////////////
@@ -87,6 +76,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
 
         gameIsRunning = false;
         preMatchIsRunning = true;
+        gameIsPaused = false;
         gameResetTimer = 0;
         gameStartTimer = 0;
 
@@ -115,7 +105,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         prePostScreenTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         playerStatsTable = new Table();
-        playerStatsTable.setBounds(0, Gdx.graphics.getHeight() - 200, Gdx.graphics.getWidth(), 200);
+        playerStatsTable.setBounds(0, Gdx.graphics.getHeight() - 214, Gdx.graphics.getWidth(), 200);
         playerStatsTable.left().top();
 
         aiStatsTable = new Table();
@@ -123,12 +113,20 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         aiStatsTable.right().top();
 
         playerHealthTable = new Table();
-        playerHealthTable.setBounds(13, Gdx.graphics.getHeight() - 117, Gdx.graphics.getWidth(), 100);
+        playerHealthTable.setBounds(13, Gdx.graphics.getHeight() - 131, Gdx.graphics.getWidth(), 100);
         playerHealthTable.left().top();
 
         aiHealthTable = new Table();
-        aiHealthTable.setBounds(0, Gdx.graphics.getHeight() - 117, Gdx.graphics.getWidth() - 13, 100);
+        aiHealthTable.setBounds(0, Gdx.graphics.getHeight() - 131, Gdx.graphics.getWidth() - 113, 100);
         aiHealthTable.right().top();
+
+        playerWonGamesTable = new Table();
+        playerWonGamesTable.setBounds(0, Gdx.graphics.getHeight() - 131, Gdx.graphics.getWidth() - 113, 100); //TODO aktualisieren
+        playerWonGamesTable.left().top();
+
+        aiWonGamesTable = new Table();
+        aiWonGamesTable.setBounds(0, Gdx.graphics.getHeight() - 131, Gdx.graphics.getWidth() - 113, 100); //TODO aktualisieren
+        aiWonGamesTable.right().top();
 
         setupUpButton();
         movementButtonsTable.row();
@@ -137,10 +135,10 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         movementButtonsTable.row();
         setupDownButton();
 
-        setupJumpButton();
+        setupAttackButton();
         setupBlockButton();
         jbaButtonsTable.row();
-        setupAttackButton();
+        setupJumpButton();
 
         setupPreMatchImage();
         setupPostMatchImage();
@@ -152,6 +150,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         setupHealthBars();
         setupHealth();
 
+        setupPauseButton();
+
         prePostScreenTable.debug();
         movementButtonsTable.debug();
         jbaButtonsTable.debug();
@@ -161,9 +161,34 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         gameStage.addActor(movementButtonsTable);
         gameStage.addActor(jbaButtonsTable);
         gameStage.addActor(playerHealthTable);
+        gameStage.addActor(aiStatsTable);
         gameStage.addActor(aiHealthTable);
         gameStage.addActor(playerStatsTable);
-        gameStage.addActor(aiStatsTable);
+
+    }
+
+    private void setupPauseButton()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/pause.pack");
+
+        Skin skin = new Skin(atlas);
+
+        Button.ButtonStyle style = new Button.ButtonStyle();
+
+        style.up = skin.getDrawable("pause.up");
+        style.down = skin.getDrawable("pause.down");
+
+        buttonPause = new Button(style);
+        buttonPause.addListener(new ClickListener()
+        {
+           @Override
+           public void clicked(InputEvent event, float x, float y)
+           {
+               //gameIsPaused = true; //TODO activate
+           }
+        });
+
+        aiStatsTable.add(buttonPause);
     }
 
     private void setupHealthBars()
@@ -362,20 +387,16 @@ public class GameClass implements Screen, GestureDetector.GestureListener
 
     private void setupAttackButton()
     {
-        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/jba.pack"); //jba = jump block attack
+        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/attack.pack"); //jba = jump block attack
 
         Skin skin = new Skin(atlas);
 
-        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        Button.ButtonStyle style = new Button.ButtonStyle();
 
-        style.up = skin.getDrawable("jba.up");
-        style.down = skin.getDrawable("jba.up");
-        style.font = new BitmapFont();
-        style.fontColor = Color.BLACK;
-        style.pressedOffsetX = 1;
-        style.pressedOffsetY = -1;
+        style.up = skin.getDrawable("attack.up");
+        style.down = skin.getDrawable("attack.down");
 
-        buttonAttack = new TextButton("A", style);
+        buttonAttack = new Button(style);
         buttonAttack.addListener(new ClickListener()
         {
             @Override
@@ -394,20 +415,16 @@ public class GameClass implements Screen, GestureDetector.GestureListener
 
     private void setupBlockButton()
     {
-        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/jba.pack"); //jba = jump block attack
+        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/block.pack"); //jba = jump block attack
 
         Skin skin = new Skin(atlas);
 
-        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        Button.ButtonStyle style = new Button.ButtonStyle();
 
-        style.up = skin.getDrawable("jba.up");
-        style.down = skin.getDrawable("jba.up");
-        style.font = new BitmapFont();
-        style.fontColor = Color.BLACK;
-        style.pressedOffsetX = 1;
-        style.pressedOffsetY = -1;
+        style.up = skin.getDrawable("block.up");
+        style.down = skin.getDrawable("block.down");
 
-        buttonBlock = new TextButton("B", style);
+        buttonBlock = new Button(style);
         buttonBlock.addListener(new ClickListener()
         {
             @Override
@@ -424,20 +441,16 @@ public class GameClass implements Screen, GestureDetector.GestureListener
 
     private void setupJumpButton()
     {
-        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/jba.pack"); //jba = jump block attack
+        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/jump.pack"); //jba = jump block attack
 
         Skin skin = new Skin(atlas);
 
-        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        Button.ButtonStyle style = new Button.ButtonStyle();
 
-        style.up = skin.getDrawable("jba.up");
-        style.down = skin.getDrawable("jba.up");
-        style.font = new BitmapFont();
-        style.fontColor = Color.BLACK;
-        style.pressedOffsetX = 1;
-        style.pressedOffsetY = -1;
+        style.up = skin.getDrawable("jump.up");
+        style.down = skin.getDrawable("jump.down");
 
-        buttonJump = new TextButton("J", style);
+        buttonJump = new Button(style);
         buttonJump.addListener(new ClickListener()
         {
             @Override
@@ -462,7 +475,11 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if (gameIsRunning)
+        if(gameIsPaused)
+        {
+
+        }
+        else if (gameIsRunning)
         {
             //actual game is running
             player.updateFacingDirection(ai);
@@ -521,8 +538,18 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         prePostScreenTable.clearChildren();
         prePostScreenTable.add(preMatchImage);
 
-        player = new Player(atlasPlayer, GameValues.PLAYER_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
-        ai = new AI(0, atlasAI, GameValues.AI_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        moveRight = false;
+        moveLeft = false;
+        jump = false;
+        standing = true;
+        attackDown = false;
+        attackUp = false;
+        duck = false;
+        attack = false;
+        block = false;
+
+        player.reset(GameValues.PLAYER_ORIGINAL_X);
+        ai.reset(GameValues.AI_ORIGINAL_X);
 
         healthPlayer.setScaleX(1f);
         healthAI.setScaleX(1f);
@@ -538,7 +565,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         prePostScreenTable.clearChildren();
     }
 
-    private void checkAcceleration() //TODO fix facDir
+    private void checkAcceleration()
     {
         float accY = Gdx.input.getAccelerometerX();
         float accX = Gdx.input.getAccelerometerY();
@@ -568,8 +595,15 @@ public class GameClass implements Screen, GestureDetector.GestureListener
                 //attack left/right
                 if (!attackUp && !attackDown && !block)
                 {
-                    attack = true;
-                    //Gdx.app.log("AccN", "attack" + accX);
+                    if(accX > 0 && player.isFacingLeft())
+                    {
+                        attack = true;
+                    }
+                    else if(accX < 0 && !player.isFacingLeft())
+                    {
+                        attack = true;
+                    }
+                    //Gdx.app.log("AccN", "attack " + accX);
                 }
             }
         } else if (Math.abs(accY) > GameValues.GAME_ACCELEROMETER_Y_MIN_SPEED)
@@ -621,7 +655,10 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         }
     }
 
-    private void checkHealth()
+    /*
+        updates the displayed health bars
+     */
+    private void updateHealth()
     {
         float health = player.getHealth();
         health /= 100;
@@ -635,6 +672,12 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     private void hasWon(Fighter winner)
     {
         winner.gameWon();
+        updateDisplayedWonGames();
+    }
+
+    private void updateDisplayedWonGames()
+    {
+
     }
 
     private void tie()
@@ -699,7 +742,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
                 ai.stun();
                 player.stun();
             }
-            checkHealth();
+            updateHealth();
         }
     }
 

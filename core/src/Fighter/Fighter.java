@@ -141,8 +141,6 @@ public class Fighter extends Sprite
         setPosition(xPos, yPos);
         setRegion(standing);
         setRegionWidth(30);
-
-
     }
 
     public void setMovementState(FighterMovementState state)
@@ -286,9 +284,7 @@ public class Fighter extends Sprite
     }
 
 
-
-
-
+    //////////////////////////////////////// Actions
 
     public void moveRight(int speed)
     {
@@ -324,6 +320,12 @@ public class Fighter extends Sprite
         }
     }
 
+    /**
+     *
+     * @param y: y-coordinate of the fighter
+     * calculates the falling/jump speed based on a normal parable
+     * @return falling/jump speed
+     */
     private float calcJumpFallSpeed(double y)
     {
         float x;
@@ -337,11 +339,6 @@ public class Fighter extends Sprite
         x = -1 * (float) Math.sqrt(radicand);
 
         return -2*x;
-    }
-
-    public void duck()
-    {
-
     }
 
     public boolean block(float delta)
@@ -367,8 +364,6 @@ public class Fighter extends Sprite
         }
         else
         {
-            //Gdx.app.log("attack", "move back");
-            //moveRight(GameValues.PLAYER_ATTACK_LEFT_SPEED);
             attackTimer = 0f;
             return false;
         }
@@ -458,6 +453,11 @@ public class Fighter extends Sprite
         wonGames++;
     }
 
+    public int getWonGames()
+    {
+        return wonGames;
+    }
+
     public boolean isFacingLeft()
     {
         return facingLeft;
@@ -468,5 +468,16 @@ public class Fighter extends Sprite
         Rectangle r = new Rectangle();
         r.set(getX(), getY(), getRegionWidth(), getRegionHeight());
         return r;
+    }
+
+    /**
+     * @param x: original x position of the fighter
+     */
+    public void reset(float x)
+    {
+        setPosition(x, GameValues.FIGHTER_ORIGINAL_HEIGHT);
+        HP = GameValues.FIGHTER_HEALTH;
+        fightingState = FighterFightingState.NONE;
+        movementState = FighterMovementState.STANDING;
     }
 }
