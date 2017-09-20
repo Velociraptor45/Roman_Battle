@@ -1,5 +1,6 @@
 package Fighter;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -33,7 +34,7 @@ public class Fighter extends Sprite
     protected TextureRegion blockedLeft;
     protected TextureRegion hitHigh;
     protected TextureRegion hitHighLeft;
-    protected TextureRegion jumpKick; // für schlag nach unten
+    protected TextureRegion jumpKick; // attack down
     protected TextureRegion jumpKickLeft;
     protected TextureRegion hit;
     protected TextureRegion hitLeft;
@@ -49,8 +50,8 @@ public class Fighter extends Sprite
     protected FighterMovementState currentMovementState;
     protected FighterMovementState previousMovementState;
 
-
-    protected float stateTimer, blockTimer, attackTimer, attackUpTimer, attackDownTimer, takeDamageTimer;
+    protected boolean stunned;
+    protected float stunTimer, stateTimer, blockTimer, attackTimer, attackUpTimer, attackDownTimer, takeDamageTimer;
 
     protected short wonGames = 0;
 
@@ -69,9 +70,11 @@ public class Fighter extends Sprite
         attackTimer = 0f;
         attackDownTimer = 0f;
         attackUpTimer = 0f;
+        stunTimer = 0f;
         takeDamageTimer = GameValues.FIGHTER_ATTACK_DURATION;
         wonGames = 0;
 
+        stunned = false;
 
         // init Animation
         Array<TextureRegion> frames = new Array<TextureRegion>();
@@ -397,9 +400,24 @@ public class Fighter extends Sprite
         }
     }
 
-    public void stun()
+    public void stun(boolean status)
     {
+        stunned = status;
+    }
 
+    public boolean isStunned(float delta)
+    {
+        if(stunned)
+        {
+            stunTimer += delta;
+            if(stunTimer >= GameValues.FIGHTER_STUN_DURATION)
+            {
+                stunTimer = 0f;
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     public boolean isOnGround()

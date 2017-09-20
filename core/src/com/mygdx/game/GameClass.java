@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import java.util.Random;
 
 import Constants.GameValues;
 import Fighter.Fighter;
@@ -38,8 +39,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     private TextureAtlas atlasPlayer;
 
     private Stage gameStage;
-    private Table playerWonGamesTable, aiWonGamesTable, playerHealthTable, aiHealthTable, playerStatsTable, aiStatsTable, movementButtonsTable, jbaButtonsTable, prePostScreenTable; //jba = jump block attack
-    private Button buttonLeft, buttonRight, buttonUp, buttonDown, buttonAttack, buttonBlock, buttonJump, buttonPause;
+    private Table playerWonGamesTable, aiWonGamesTable, playerHealthTable, aiHealthTable, playerStatsTable, aiStatsTable, movementButtonsTable, prePostScreenTable, pauseTable, jbaButtonsTable; //jba = jump block attack
+    private Button buttonLeft, buttonRight, buttonUp, buttonDown, buttonAttack, buttonBlock, buttonJump, buttonPause, buttonMenu, buttonRestart;
     private Image preMatchImage, postMatchImage, postMatchImageKO, postMatchImageTIE, healthBarPlayer, healthBarAI, healthPlayer, healthAI;
 
     private boolean gameIsRunning, preMatchIsRunning, gameIsPaused;
@@ -128,6 +129,10 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         aiWonGamesTable.setBounds(0, Gdx.graphics.getHeight() - 131, Gdx.graphics.getWidth() - 113, 100); //TODO aktualisieren
         aiWonGamesTable.right().top();
 
+        pauseTable = new Table();
+        pauseTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); //TODO aktualisieren
+        pauseTable.center();
+
         setupUpButton();
         movementButtonsTable.row();
         setupLeftButton();
@@ -151,6 +156,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         setupHealth();
 
         setupPauseButton();
+        setupMenuButton();
+        setupRestartButton();
 
         prePostScreenTable.debug();
         movementButtonsTable.debug();
@@ -164,7 +171,50 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         gameStage.addActor(aiStatsTable);
         gameStage.addActor(aiHealthTable);
         gameStage.addActor(playerStatsTable);
+        gameStage.addActor(pauseTable);
 
+    }
+
+    private void setupMenuButton()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/menu.pack");
+
+        Skin skin = new Skin(atlas);
+
+        Button.ButtonStyle style = new Button.ButtonStyle();
+        style.up = skin.getDrawable("menu.up");
+        style.down = skin.getDrawable("menu.down");
+
+        buttonMenu = new Button(style);
+        buttonMenu.addListener(new ClickListener()
+        {
+            @Override
+            public void clicked(InputEvent event, float x, float y)
+            {
+                mainClass.setScreen(new MainMenu(mainClass));
+            }
+        });
+    }
+
+    private void setupRestartButton()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/game/buttons/restart.pack");
+
+        Skin skin = new Skin(atlas);
+
+        Button.ButtonStyle style = new Button.ButtonStyle();
+        style.up = skin.getDrawable("restart.up");
+        style.down = skin.getDrawable("restart.down");
+
+        buttonRestart = new Button(style);
+        buttonRestart.addListener(new ClickListener()
+        {
+            @Override
+            public void clicked(InputEvent event, float x, float y)
+            {
+                reset();
+            }
+        });
     }
 
     private void setupPauseButton()
@@ -184,11 +234,29 @@ public class GameClass implements Screen, GestureDetector.GestureListener
            @Override
            public void clicked(InputEvent event, float x, float y)
            {
-               //gameIsPaused = true; //TODO activate
+               if(gameIsRunning || preMatchIsRunning)
+               {
+                   if (!gameIsPaused)
+                   {
+                       gameIsPaused = true; //TODO activate
+                       setupPauseMenu();
+                   } else
+                   {
+                       gameIsPaused = false;
+                       pauseTable.clearChildren();
+                   }
+               }
            }
         });
 
         aiStatsTable.add(buttonPause);
+    }
+
+    private void setupPauseMenu()
+    {
+        pauseTable.add(buttonRestart);
+        pauseTable.row();
+        pauseTable.add(buttonMenu);
     }
 
     private void setupHealthBars()
@@ -495,7 +563,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             collision(player, ai);
 
             areFightersAlive();
-        } else if (preMatchIsRunning)
+        }
+        else if (preMatchIsRunning)
         {
             //pre match display is shown, game will start
             gameStartTimer += delta;
@@ -503,7 +572,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             {
                 startGame();
             }
-        } else
+        }
+        else
         {
             //at least one Fighter is K.O.
             if (gameResetTimer >= GameValues.GAME_RESET_TIME)
@@ -516,8 +586,11 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             }
         }
 
-        player.update(delta);
-        ai.update(delta);
+        if(!gameIsPaused)
+        {
+            player.update(delta);
+            ai.update(delta);
+        }
 
         mainClass.getSpriteBatch().begin();
         mainClass.getSpriteBatch().draw(player, player.getX(), player.getY());
@@ -531,6 +604,13 @@ public class GameClass implements Screen, GestureDetector.GestureListener
 
     private void reset()
     {
+        if(gameIsPaused)
+        {
+            gameIsPaused = false;
+            pauseTable.clearChildren();
+            currentlyWonGames = 0;
+            writeFile();
+        }
         gameIsRunning = false;
         preMatchIsRunning = true;
         gameResetTimer = 0;
@@ -644,7 +724,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             }
             gameIsRunning = false;
             showPostMatchScreen();
-        } else if (!ai.isAlive())
+        }
+        else if (!ai.isAlive())
         {
             KO();
             hasWon(player);
@@ -693,6 +774,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     private void showPostMatchScreen()
     {
         prePostScreenTable.add(postMatchImage);
+        prePostScreenTable.row();
+        prePostScreenTable.add(buttonRestart);
+        prePostScreenTable.add(buttonMenu);
     }
 
 
@@ -703,44 +787,66 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     {
         if (Intersector.overlaps(player.getRectangle(), ai.getRectangle()))
         {
+            Random random = new Random();
             if (player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.BLOCK || ai.getCurrentMovementState() == Fighter.FighterMovementState.DUCKING))
             {
                 //player attacked nomal, ai couldn't block
                 ai.takeDamage(GameValues.PLAYER_DAMAGE);
-                ai.stun();
+                if(random.nextInt(100) <= GameValues.FIGHTER_STUN_CHANCE)
+                {
+                    ai.stun(true);
+                }
             } else if (ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK && !(player.getCurrentFightingState() == Fighter.FighterFightingState.BLOCK || player.getCurrentMovementState() == Fighter.FighterMovementState.DUCKING))
             {
                 //ai attacked normal, player couldn't block
                 player.takeDamage(GameValues.AI_DAMAGE);
-                player.stun();
+                if(random.nextInt(100) <= GameValues.FIGHTER_STUN_CHANCE)
+                {
+                    player.stun(true);
+                }
             } else if (player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP))
             {
                 //player attacked from above
                 ai.takeDamage(GameValues.PLAYER_DAMAGE);
-                ai.stun();
+                if(random.nextInt(100) <= GameValues.FIGHTER_STUN_CHANCE)
+                {
+                    ai.stun(true);
+                }
             } else if (ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN && !(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP))
             {
                 //ai attacked from above
                 player.takeDamage(GameValues.AI_DAMAGE);
-                player.stun();
+                if(random.nextInt(100) <= GameValues.FIGHTER_STUN_CHANCE)
+                {
+                    player.stun(true);
+                }
             } else if (player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP && !(ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN))
             {
                 //player attacked from underneath
                 ai.takeDamage(GameValues.PLAYER_DAMAGE);
-                ai.stun();
+                if(random.nextInt(100) <= GameValues.FIGHTER_STUN_CHANCE)
+                {
+                    ai.stun(true);
+                }
             } else if (ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP && !(player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN))
             {
                 //ai attacked from underneath
                 player.takeDamage(GameValues.AI_DAMAGE);
-                player.stun();
+                if(random.nextInt(100) <= GameValues.FIGHTER_STUN_CHANCE)
+                {
+                    player.stun(true);
+                }
             } else if ((ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP || ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN || ai.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK) && (player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_DOWN || player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK_UP || player.getCurrentFightingState() == Fighter.FighterFightingState.ATTACK))
             {
                 //both attacked at the same time
                 ai.takeDamage(GameValues.PLAYER_DAMAGE);
                 player.takeDamage(GameValues.AI_DAMAGE);
 
-                ai.stun();
-                player.stun();
+                if(random.nextInt(100) <= GameValues.FIGHTER_STUN_CHANCE)
+                {
+                    ai.stun(true);
+                    player.stun(true);
+                }
             }
             updateHealth();
         }

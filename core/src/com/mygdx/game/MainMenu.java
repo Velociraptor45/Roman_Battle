@@ -1,17 +1,13 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -19,11 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
-
-import Constants.GameValues;
 
 
 /**
@@ -45,8 +36,7 @@ public class MainMenu implements Screen, InputProcessor {
     private Stage menuStage;
     private Table menuStartButtonTable, menuTopButtonsTable;
 
-    private TextButton menuTutorialButton;
-    private Button menuSettingsButton, menuStartButton;
+    private Button menuHighscoreButton, menuStartButton, menuTutorialButton;
 
     ///File
     private int maxWonGames;
@@ -77,13 +67,12 @@ public class MainMenu implements Screen, InputProcessor {
 
 
         setupTutorialButton();
-        setupSettingsButton();
+        //setupHighscoreButton();
         setupStartButton();
+        setupBackgroundImage();
 
-        menuTopButtonsTable.top().left();
+        menuTopButtonsTable.bottom().left();
 
-        menuStartButtonTable.debug();
-        menuTopButtonsTable.debug();
         menuStage.addActor(menuStartButtonTable);
         menuStage.addActor(menuTopButtonsTable);
 
@@ -91,6 +80,15 @@ public class MainMenu implements Screen, InputProcessor {
         currentlyWonGames = 0;
         readFile();
         game = new GameClass(mainClass, maxWonGames, currentlyWonGames);
+    }
+
+    private void setupBackgroundImage()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/menu/menuBackground.pack");
+
+        Skin skin = new Skin(atlas);
+
+        menuStartButtonTable.background(skin.getDrawable("menuBackground.up"));
     }
 
     private void setupStartButton()
@@ -119,42 +117,36 @@ public class MainMenu implements Screen, InputProcessor {
 
     private void setupTutorialButton()
     {
-        TextureAtlas menuTutorialButtonAtlas = new TextureAtlas("ui/menu/menuTutorialButton.pack");
+        TextureAtlas menuTutorialButtonAtlas = new TextureAtlas("ui/menu/tutorial.pack");
         Skin menuTutorialButtonSkin = new Skin(menuTutorialButtonAtlas);
 
-        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.up = menuTutorialButtonSkin.getDrawable("menuTutorialButton.up");
-        style.down = menuTutorialButtonSkin.getDrawable("menuTutorialButton.up");
-        style.font = new BitmapFont(false); //TODO richtige Schriftart auswählen und über Bitmap setzen
-        style.fontColor = Color.BLACK;
-        style.pressedOffsetX = 1;
-        style.pressedOffsetY = -1;
+        Button.ButtonStyle style = new Button.ButtonStyle();
+        style.up = menuTutorialButtonSkin.getDrawable("tutorial.up");
+        style.down = menuTutorialButtonSkin.getDrawable("tutorial.down");
 
-        menuTutorialButton = new TextButton("?", style);
+        menuTutorialButton = new Button(style);
         menuTutorialButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                //TODO set Screen for Setting
+                //TODO set Screen for Tutorial
             }
         });
 
         menuTopButtonsTable.add(menuTutorialButton);
     }
 
-    private void setupSettingsButton()
+    private void setupHighscoreButton()
     {
-        TextureAtlas menuSettingsButtonAtlas = new TextureAtlas("ui/menu/menuSettingsButton.pack");
+        TextureAtlas menuSettingsButtonAtlas = new TextureAtlas("ui/menu/highscore.pack");
         Skin menuSettingsButtonSkin = new Skin(menuSettingsButtonAtlas);
 
         Button.ButtonStyle style = new Button.ButtonStyle();
-        style.up = menuSettingsButtonSkin.getDrawable("menuSettingsButton.up");
-        style.down = menuSettingsButtonSkin.getDrawable("menuSettingsButton.up");
-        style.pressedOffsetX = 1;
-        style.pressedOffsetY = -1;
+        style.up = menuSettingsButtonSkin.getDrawable("highscore.up");
+        style.down = menuSettingsButtonSkin.getDrawable("highscore.down");
 
-        menuSettingsButton = new Button(style);
-        menuSettingsButton.addListener(new ClickListener() {
+        menuHighscoreButton = new Button(style);
+        menuHighscoreButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
@@ -162,7 +154,7 @@ public class MainMenu implements Screen, InputProcessor {
             }
         });
 
-        menuTopButtonsTable.add(menuSettingsButton);
+        menuTopButtonsTable.add(menuHighscoreButton);
     }
 
     @Override

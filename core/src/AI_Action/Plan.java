@@ -1,7 +1,5 @@
 package AI_Action;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
 import Constants.GameValues;
 import Fighter.Fighter;
 

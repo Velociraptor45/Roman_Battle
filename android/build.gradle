@@ -133,6 +133,5 @@ idea {
     }
 }
     dependencies {
-        //compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
 }
