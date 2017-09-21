@@ -19,6 +19,8 @@ public class GameValues
     public static final float GAME_ACCELEROMETER_X_MIN_SPEED = 11f;
     public static final float GAME_ACCELEROMETER_Y_MIN_SPEED = 11f;
 
+    public static final int GAME_ROUNDS_NEEDED_FOR_WIN = 3;
+
     //Fighter
     public static final int FIGHTER_HEALTH = 100;
 
@@ -33,8 +35,8 @@ public class GameValues
     //moves the player left because of bigger texture size while attacking left
     public static final int PLAYER_ATTACK_LEFT_SPEED = 49;
 
-    public static final int PLAYER_DAMAGE = 10;
-    public static final int AI_DAMAGE = 10;
+    public static final int PLAYER_DAMAGE = 100;
+    public static final int AI_DAMAGE = 100;
 
     public static final float FIGHTER_STUN_CHANCE = 50;
 
@@ -80,7 +82,7 @@ public class GameValues
     public static final float AI_STANDARD_MOVE_CHANGE_TIME = 0.5f;
 
     public static final int AI_MIN_TIME_STANDARD_MOVE = 2;
-    public static final float AI_MIN_TIME_MOVING_IN_DIRECTION = 1.5f;
+    public static final float AI_MIN_TIME_MOVING_IN_DIRECTION = 0.5f;
     public static final float AI_MIN_STANDING_TIME = 1f;
 
     public static final int AI_MAX_PLAN_EXECUTION_TIME = 5;

@@ -4,16 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 
@@ -34,7 +31,7 @@ public class MainMenu implements Screen, InputProcessor {
     GameClass game;
 
     private Stage menuStage;
-    private Table menuStartButtonTable, menuTopButtonsTable;
+    private Table menuStartButtonTable, menuBottomButtonsTable;
 
     private Button menuHighscoreButton, menuStartButton, menuTutorialButton;
 
@@ -61,20 +58,20 @@ public class MainMenu implements Screen, InputProcessor {
         Gdx.input.setInputProcessor(menuStage);
 
         menuStartButtonTable = new Table();
-        menuTopButtonsTable = new Table();
+        menuBottomButtonsTable = new Table();
         menuStartButtonTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        menuTopButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        menuBottomButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 
         setupTutorialButton();
-        //setupHighscoreButton();
+        setupHighscoreButton();
         setupStartButton();
         setupBackgroundImage();
 
-        menuTopButtonsTable.bottom().left();
+        menuBottomButtonsTable.bottom().left();
 
         menuStage.addActor(menuStartButtonTable);
-        menuStage.addActor(menuTopButtonsTable);
+        menuStage.addActor(menuBottomButtonsTable);
 
         maxWonGames = 0;
         currentlyWonGames = 0;
@@ -133,17 +130,17 @@ public class MainMenu implements Screen, InputProcessor {
             }
         });
 
-        menuTopButtonsTable.add(menuTutorialButton);
+        menuBottomButtonsTable.add(menuTutorialButton);
     }
 
     private void setupHighscoreButton()
     {
-        TextureAtlas menuSettingsButtonAtlas = new TextureAtlas("ui/menu/highscore.pack");
+        TextureAtlas menuSettingsButtonAtlas = new TextureAtlas("ui/menu/highscoreButton.pack");
         Skin menuSettingsButtonSkin = new Skin(menuSettingsButtonAtlas);
 
         Button.ButtonStyle style = new Button.ButtonStyle();
-        style.up = menuSettingsButtonSkin.getDrawable("highscore.up");
-        style.down = menuSettingsButtonSkin.getDrawable("highscore.down");
+        style.up = menuSettingsButtonSkin.getDrawable("highscoreButton.up");
+        style.down = menuSettingsButtonSkin.getDrawable("highscoreButton.down");
 
         menuHighscoreButton = new Button(style);
         menuHighscoreButton.addListener(new ClickListener() {
@@ -154,7 +151,7 @@ public class MainMenu implements Screen, InputProcessor {
             }
         });
 
-        menuTopButtonsTable.add(menuHighscoreButton);
+        menuBottomButtonsTable.add(menuHighscoreButton);
     }
 
     @Override

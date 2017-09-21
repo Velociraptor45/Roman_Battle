@@ -1,12 +1,12 @@
 
-menuSettingsButton.png
+wonRounds.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-menuSettingsButton.up
+wonRounds.up
   rotate: false
-  xy: 1, 1
-  size: 32, 32
-  orig: 32, 32
+  xy: 0, 0
+  size: 160, 49
+  orig: 160, 49
   offset: 0, 0
   index: -1

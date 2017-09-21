@@ -53,7 +53,7 @@ public class Fighter extends Sprite
     protected boolean stunned;
     protected float stunTimer, stateTimer, blockTimer, attackTimer, attackUpTimer, attackDownTimer, takeDamageTimer;
 
-    protected short wonGames = 0;
+    protected short wonRounds = 0;
 
     ////////////////////////////////////////////////////////////
     protected int HP = GameValues.FIGHTER_HEALTH;
@@ -72,7 +72,7 @@ public class Fighter extends Sprite
         attackUpTimer = 0f;
         stunTimer = 0f;
         takeDamageTimer = GameValues.FIGHTER_ATTACK_DURATION;
-        wonGames = 0;
+        wonRounds = 0;
 
         stunned = false;
 
@@ -466,14 +466,14 @@ public class Fighter extends Sprite
         return !(HP <= 0);
     }
 
-    public void gameWon()
+    public void roundWon()
     {
-        wonGames++;
+        wonRounds++;
     }
 
-    public int getWonGames()
+    public int getWonRounds()
     {
-        return wonGames;
+        return wonRounds;
     }
 
     public boolean isFacingLeft()
@@ -488,6 +488,12 @@ public class Fighter extends Sprite
         return r;
     }
 
+    //checks if the fighter has won 3 of 5 rounds
+    public boolean hasWonGame()
+    {
+        return wonRounds >= GameValues.GAME_ROUNDS_NEEDED_FOR_WIN;
+    }
+
     /**
      * @param x: original x position of the fighter
      */
@@ -497,5 +503,10 @@ public class Fighter extends Sprite
         HP = GameValues.FIGHTER_HEALTH;
         fightingState = FighterFightingState.NONE;
         movementState = FighterMovementState.STANDING;
+    }
+
+    public void resetWonRounds()
+    {
+        wonRounds = 0;
     }
 }

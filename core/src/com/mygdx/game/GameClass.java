@@ -16,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
+
 import java.util.Random;
 
 import Constants.GameValues;
@@ -37,14 +39,17 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     private AI ai;
     private TextureAtlas atlasAI;
     private TextureAtlas atlasPlayer;
+    private Skin wonRoundsSkin;
 
     private Stage gameStage;
-    private Table playerWonGamesTable, aiWonGamesTable, playerHealthTable, aiHealthTable, playerStatsTable, aiStatsTable, movementButtonsTable, prePostScreenTable, pauseTable, jbaButtonsTable; //jba = jump block attack
+    private Table playerWonRoundsTable, aiWonRoundsTable, playerHealthTable, aiHealthTable, playerStatsTable, aiStatsTable, movementButtonsTable, prePostScreenTable, pauseTable, jbaButtonsTable; //jba = jump block attack
     private Button buttonLeft, buttonRight, buttonUp, buttonDown, buttonAttack, buttonBlock, buttonJump, buttonPause, buttonMenu, buttonRestart;
     private Image preMatchImage, postMatchImage, postMatchImageKO, postMatchImageTIE, healthBarPlayer, healthBarAI, healthPlayer, healthAI;
+    private Image playerDotOne, playerDotTwo, playerDotThree, aiDotOne, aiDotTwo, aiDotThree, playerWonRounds, aiWonRounds;
+    private Image[] playerDots, aiDots;
 
     private boolean gameIsRunning, preMatchIsRunning, gameIsPaused;
-    private float gameResetTimer, gameStartTimer;
+    private float gameStartTimer, postMatchTimer;
 
     ////////////////////////////////////////////////////////////////////////
     private boolean moveRight = false;
@@ -78,8 +83,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         gameIsRunning = false;
         preMatchIsRunning = true;
         gameIsPaused = false;
-        gameResetTimer = 0;
         gameStartTimer = 0;
+        postMatchTimer = 0;
 
         maxWonGames = maxWon;
         currentlyWonGames = curWon;
@@ -99,7 +104,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
 
         movementButtonsTable = new Table();
         jbaButtonsTable = new Table();
-        movementButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        movementButtonsTable.setBounds(0, 0, 200, 296);
         jbaButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         prePostScreenTable = new Table();
@@ -121,14 +126,6 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         aiHealthTable.setBounds(0, Gdx.graphics.getHeight() - 131, Gdx.graphics.getWidth() - 113, 100);
         aiHealthTable.right().top();
 
-        playerWonGamesTable = new Table();
-        playerWonGamesTable.setBounds(0, Gdx.graphics.getHeight() - 131, Gdx.graphics.getWidth() - 113, 100); //TODO aktualisieren
-        playerWonGamesTable.left().top();
-
-        aiWonGamesTable = new Table();
-        aiWonGamesTable.setBounds(0, Gdx.graphics.getHeight() - 131, Gdx.graphics.getWidth() - 113, 100); //TODO aktualisieren
-        aiWonGamesTable.right().top();
-
         pauseTable = new Table();
         pauseTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); //TODO aktualisieren
         pauseTable.center();
@@ -149,7 +146,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         setupPostMatchImage();
 
         prePostScreenTable.center();
-        movementButtonsTable.bottom().left();
+        movementButtonsTable.right();
         jbaButtonsTable.bottom().right();
 
         setupHealthBars();
@@ -159,20 +156,86 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         setupMenuButton();
         setupRestartButton();
 
-        prePostScreenTable.debug();
+        playerWonRoundsTable = new Table();
+        playerWonRoundsTable.setBounds(0, Gdx.graphics.getHeight() - 147, healthBarPlayer.getWidth(), 100); //TODO aktualisieren
+        playerWonRoundsTable.right().bottom();
+
+        aiWonRoundsTable = new Table();
+        aiWonRoundsTable.setBounds(Gdx.graphics.getWidth() - (healthBarAI.getWidth() + buttonPause.getWidth()), Gdx.graphics.getHeight() - 147, healthBarAI.getWidth() + buttonPause.getWidth(), 100); //TODO aktualisieren
+        aiWonRoundsTable.left().bottom();
+
+        setupWonRoundsImage();
+        setupDots();
+
+
+
+        /*prePostScreenTable.debug();
         movementButtonsTable.debug();
         jbaButtonsTable.debug();
         //playerStatsTable.debug();
         //aiStatsTable.debug();
+        playerWonRoundsTable.debug();
+        aiWonRoundsTable.debug();*/
         gameStage.addActor(prePostScreenTable);
         gameStage.addActor(movementButtonsTable);
         gameStage.addActor(jbaButtonsTable);
+        gameStage.addActor(playerWonRoundsTable);
+        gameStage.addActor(aiWonRoundsTable);
+        gameStage.addActor(aiHealthTable);
         gameStage.addActor(playerHealthTable);
         gameStage.addActor(aiStatsTable);
-        gameStage.addActor(aiHealthTable);
         gameStage.addActor(playerStatsTable);
         gameStage.addActor(pauseTable);
+    }
 
+    private void setupWonRoundsImage()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/game/won_rounds/wonRounds.pack");
+
+        Skin skin = new Skin(atlas);
+
+        playerWonRounds = new Image(skin, "wonRounds.up");
+        aiWonRounds = new Image(skin, "wonRounds.up");
+
+        playerStatsTable.row();
+        playerStatsTable.add(playerWonRounds).align(Align.right);
+
+        aiStatsTable.row();
+        aiStatsTable.add(aiWonRounds).align(Align.left);
+    }
+
+    private void setupDots()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/game/won_rounds/dot.pack");
+
+        wonRoundsSkin = new Skin(atlas);
+
+        playerDotOne = new Image(wonRoundsSkin, "dot.black");
+        playerDotTwo = new Image(wonRoundsSkin, "dot.black");
+        playerDotThree = new Image(wonRoundsSkin, "dot.black");
+
+        aiDotOne = new Image(wonRoundsSkin, "dot.black");
+        aiDotTwo = new Image(wonRoundsSkin, "dot.black");
+        aiDotThree = new Image(wonRoundsSkin, "dot.black");
+
+        playerDots = new Image[] {playerDotOne, playerDotTwo, playerDotThree};
+        aiDots = new Image[] {aiDotOne, aiDotTwo, aiDotThree};
+
+        addDotsToTable();
+    }
+
+    private void addDotsToTable()
+    {
+        playerWonRoundsTable.clearChildren();
+        aiWonRoundsTable.clearChildren();
+
+        playerWonRoundsTable.add(playerDots[0]).spaceRight(5);
+        playerWonRoundsTable.add(playerDots[1]).spaceRight(5);
+        playerWonRoundsTable.add(playerDots[2]);
+
+        aiWonRoundsTable.add(aiDots[2]).spaceRight(5);
+        aiWonRoundsTable.add(aiDots[1]).spaceRight(5);
+        aiWonRoundsTable.add(aiDots[0]);
     }
 
     private void setupMenuButton()
@@ -268,7 +331,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         healthBarAI = new Image(skin, "healthbar.up");
         healthBarPlayer = new Image(skin, "healthbar.up");
 
-        playerStatsTable.add(healthBarPlayer);
+        playerStatsTable.add(healthBarPlayer).spaceBottom(14);
         aiStatsTable.add(healthBarAI);
     }
 
@@ -414,6 +477,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         });
 
         movementButtonsTable.add(buttonUp);
+
     }
 
     private void setupDownButton()
@@ -573,20 +637,17 @@ public class GameClass implements Screen, GestureDetector.GestureListener
                 startGame();
             }
         }
-        else
+        else if(!(player.hasWonGame() || ai.hasWonGame()))
         {
-            //at least one Fighter is K.O.
-            if (gameResetTimer >= GameValues.GAME_RESET_TIME)
+            postMatchTimer += delta;
+            if(postMatchTimer >= GameValues.GAME_RESET_TIME)
             {
+                postMatchTimer = 0;
                 reset();
-            }
-            else
-            {
-                gameResetTimer += delta;
             }
         }
 
-        if(!gameIsPaused)
+        if(!gameIsPaused && (gameIsRunning || preMatchIsRunning))
         {
             player.update(delta);
             ai.update(delta);
@@ -613,7 +674,6 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         }
         gameIsRunning = false;
         preMatchIsRunning = true;
-        gameResetTimer = 0;
         gameStartTimer = 0;
         prePostScreenTable.clearChildren();
         prePostScreenTable.add(preMatchImage);
@@ -627,6 +687,13 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         duck = false;
         attack = false;
         block = false;
+
+        if(player.hasWonGame() || ai.hasWonGame())
+        {
+            player.resetWonRounds();
+            ai.resetWonRounds();
+            setupDots();
+        }
 
         player.reset(GameValues.PLAYER_ORIGINAL_X);
         ai.reset(GameValues.AI_ORIGINAL_X);
@@ -715,7 +782,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             if (!ai.isAlive())
             {
                 tie();
-            } else
+            }
+            else
             {
                 KO();
                 hasWon(ai);
@@ -723,7 +791,15 @@ public class GameClass implements Screen, GestureDetector.GestureListener
                 writeFile();
             }
             gameIsRunning = false;
-            showPostMatchScreen();
+
+            if(player.hasWonGame() || ai.hasWonGame())
+            {
+                showPostMatchScreen();
+            }
+            else
+            {
+                showPostRoundScreen();
+            }
         }
         else if (!ai.isAlive())
         {
@@ -732,7 +808,16 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             currentlyWonGames++;
             writeFile();
             gameIsRunning = false;
-            showPostMatchScreen();
+
+
+            if(player.hasWonGame() || ai.hasWonGame())
+            {
+                showPostMatchScreen();
+            }
+            else
+            {
+                showPostRoundScreen();
+            }
         }
     }
 
@@ -752,13 +837,26 @@ public class GameClass implements Screen, GestureDetector.GestureListener
 
     private void hasWon(Fighter winner)
     {
-        winner.gameWon();
+        winner.roundWon();
         updateDisplayedWonGames();
     }
 
     private void updateDisplayedWonGames()
     {
+        playerWonRoundsTable.clearChildren();
+        aiWonRoundsTable.clearChildren();
 
+        if(player.getWonRounds() > 0)
+        {
+
+            playerDots[player.getWonRounds() - 1] = new Image(wonRoundsSkin, "dot.red");
+        }
+        if(ai.getWonRounds() > 0)
+        {
+            aiDots[ai.getWonRounds() - 1] = new Image(wonRoundsSkin, "dot.red");
+        }
+
+        addDotsToTable();
     }
 
     private void tie()
@@ -776,7 +874,13 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         prePostScreenTable.add(postMatchImage);
         prePostScreenTable.row();
         prePostScreenTable.add(buttonRestart);
+        prePostScreenTable.row();
         prePostScreenTable.add(buttonMenu);
+    }
+
+    private void showPostRoundScreen()
+    {
+        prePostScreenTable.add(postMatchImage);
     }
 
 
