@@ -36,7 +36,7 @@ public class GameValues
     public static final int PLAYER_ATTACK_LEFT_SPEED = 49;
 
     public static final int PLAYER_DAMAGE = 100;
-    public static final int AI_DAMAGE = 100;
+    public static final int AI_DAMAGE = 10;
 
     public static final float FIGHTER_STUN_CHANCE = 50;
 

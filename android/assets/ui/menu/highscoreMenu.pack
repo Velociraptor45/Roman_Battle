@@ -1,12 +1,12 @@
 
-healthbar.png
+highscoreMenu.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-healthbar.h
+highscoreMenu.up
   rotate: false
   xy: 0, 0
-  size: 306, 70
-  orig: 306, 70
+  size: 690, 600
+  orig: 690, 600
   offset: 0, 0
   index: -1

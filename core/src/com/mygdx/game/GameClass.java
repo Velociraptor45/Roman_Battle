@@ -326,10 +326,10 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     {
         TextureAtlas atlas = new TextureAtlas("ui/game/healthbar/healthbar.pack");
 
-        Skin skin = new Skin(atlas);
+        Skin hSkin = new Skin(atlas);
 
-        healthBarAI = new Image(skin, "healthbar.up");
-        healthBarPlayer = new Image(skin, "healthbar.up");
+        healthBarAI = new Image(hSkin, "healthbar.h");
+        healthBarPlayer = new Image(hSkin, "healthbar.h");
 
         playerStatsTable.add(healthBarPlayer).spaceBottom(14);
         aiStatsTable.add(healthBarAI);
@@ -805,13 +805,16 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         {
             KO();
             hasWon(player);
-            currentlyWonGames++;
-            writeFile();
             gameIsRunning = false;
 
 
             if(player.hasWonGame() || ai.hasWonGame())
             {
+                if(player.hasWonGame())
+                {
+                    currentlyWonGames++;
+                    writeFile();
+                }
                 showPostMatchScreen();
             }
             else

@@ -3,17 +3,17 @@ tutorial.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+tutorial.down
+  rotate: false
+  xy: 0, 57
+  size: 200, 57
+  orig: 200, 57
+  offset: 0, 0
+  index: -1
 tutorial.up
   rotate: false
   xy: 0, 0
-  size: 200, 83
-  orig: 200, 83
-  offset: 0, 0
-  index: -1
-tutorial.down
-  rotate: false
-  xy: 200, 1
-  size: 200, 82
-  orig: 200, 82
+  size: 200, 57
+  orig: 200, 57
   offset: 0, 0
   index: -1
