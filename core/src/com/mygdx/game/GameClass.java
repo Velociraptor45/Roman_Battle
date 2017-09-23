@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -66,6 +67,8 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     //////////////////////////////////////////////////////////////////
     private int maxWonGames;
     private int currentlyWonGames;
+    //////////////////////////////////////////////////////////////////
+    private Music backgroundMusic;
 
 
     // we need the MainClass object to access the SpriteBatch
@@ -131,7 +134,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         aiHealthTable.right().top();
 
         pauseTable = new Table();
-        pauseTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); //TODO aktualisieren
+        pauseTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         pauseTable.center();
 
         setupUpButton();
@@ -161,25 +164,18 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         setupRestartButton();
 
         playerWonRoundsTable = new Table();
-        playerWonRoundsTable.setBounds(0, Gdx.graphics.getHeight() - 147, healthBarPlayer.getWidth(), 100); //TODO aktualisieren
+        playerWonRoundsTable.setBounds(0, Gdx.graphics.getHeight() - 147, healthBarPlayer.getWidth(), 100);
         playerWonRoundsTable.right().bottom();
 
         aiWonRoundsTable = new Table();
-        aiWonRoundsTable.setBounds(Gdx.graphics.getWidth() - (healthBarAI.getWidth() + buttonPause.getWidth()), Gdx.graphics.getHeight() - 147, healthBarAI.getWidth() + buttonPause.getWidth(), 100); //TODO aktualisieren
+        aiWonRoundsTable.setBounds(Gdx.graphics.getWidth() - (healthBarAI.getWidth() + buttonPause.getWidth()), Gdx.graphics.getHeight() - 147, healthBarAI.getWidth() + buttonPause.getWidth(), 100);
         aiWonRoundsTable.left().bottom();
 
         setupWonRoundsImage();
         setupDots();
 
+        setupMusic();
 
-
-        /*prePostScreenTable.debug();
-        movementButtonsTable.debug();
-        jbaButtonsTable.debug();
-        //playerStatsTable.debug();
-        //aiStatsTable.debug();
-        playerWonRoundsTable.debug();
-        aiWonRoundsTable.debug();*/
         gameStage.addActor(prePostScreenTable);
         gameStage.addActor(movementButtonsTable);
         gameStage.addActor(jbaButtonsTable);
@@ -190,6 +186,13 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         gameStage.addActor(aiStatsTable);
         gameStage.addActor(playerStatsTable);
         gameStage.addActor(pauseTable);
+    }
+
+    private void setupMusic()
+    {
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/fight_music.ogg"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
     }
 
     private void setupWonRoundsImage()
@@ -258,6 +261,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
+                backgroundMusic.dispose();
                 mainClass.setScreen(new MainMenu(mainClass));
             }
         });
@@ -305,7 +309,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
                {
                    if (!gameIsPaused)
                    {
-                       gameIsPaused = true; //TODO activate
+                       gameIsPaused = true;
                        setupPauseMenu();
                    } else
                    {
@@ -536,7 +540,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         buttonAttack.addListener(new ClickListener()
         {
             @Override
-            public void clicked(InputEvent event, float x, float y)
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
             {
                 attack = true;
                 if(player.isFacingLeft())
@@ -564,7 +568,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         buttonBlock.addListener(new ClickListener()
         {
             @Override
-            public void clicked(InputEvent event, float x, float y)
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
             {
                 block = true;
             }
@@ -590,7 +594,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         buttonJump.addListener(new ClickListener()
         {
             @Override
-            public void clicked(InputEvent event, float x, float y)
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor)
             {
                 if (player.getY() <= GameValues.FIGHTER_ORIGINAL_HEIGHT)
                 {
@@ -621,13 +625,18 @@ public class GameClass implements Screen, GestureDetector.GestureListener
             player.updateFacingDirection(ai);
             ai.updateFacingDirection(player);
 
-            ai.act(player, delta);
+            if(!ai.isStunned(delta))
+            {
+                ai.act(player, delta);
+            }
 
-            checkAcceleration();
+            if(!player.isStunned(delta))
+            {
+                checkAcceleration();
 
-            switchPlayerMovementState();
-            switchPlayerFightingState(delta);
-
+                switchPlayerMovementState();
+                switchPlayerFightingState(delta);
+            }
             collision(player, ai);
 
             areFightersAlive();

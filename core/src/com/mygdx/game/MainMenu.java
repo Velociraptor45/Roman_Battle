@@ -3,6 +3,8 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -41,11 +43,15 @@ public class MainMenu implements Screen, InputProcessor {
 
     private Button menuHighscoreButton, menuStartButton, menuTutorialButton;
 
+    private Music backgroundMusic;
+
     private boolean isHighscoreDisplayed, isTutorialDisplayed;
 
     ///File
     private int maxWonGames;
     private int currentlyWonGames;
+
+
 
    // we need the MainClass Objekt to access the SpriteBatch
    public MainMenu(MainClass mainClass){
@@ -97,6 +103,15 @@ public class MainMenu implements Screen, InputProcessor {
         currentlyWonGames = 0;
         readFile();
         game = new GameClass(mainClass, maxWonGames, currentlyWonGames);
+
+        setupMusic();
+    }
+
+    private void setupMusic()
+    {
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/menu_music.ogg"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
     }
 
     private void setupHighscoreScore()
@@ -142,6 +157,7 @@ public class MainMenu implements Screen, InputProcessor {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
+                backgroundMusic.dispose();
                 game = new GameClass(mainClass, maxWonGames, currentlyWonGames);
                 mainClass.setScreen(game);
             }

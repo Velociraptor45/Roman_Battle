@@ -324,7 +324,7 @@ public class Fighter extends Sprite
 
     public void moveRight(int speed)
     {
-        if(getX() + getRegionWidth() + speed <= Gdx.graphics.getWidth()) //TODO getWidth() austauschen
+        if(getX() + getRegionWidth() + speed <= Gdx.graphics.getWidth())
         {
             setPosition(getX() + speed, getY());
         }
@@ -446,6 +446,7 @@ public class Fighter extends Sprite
             if(stunTimer >= GameValues.FIGHTER_STUN_DURATION)
             {
                 stunTimer = 0f;
+                stunned = false;
                 return false;
             }
             return true;

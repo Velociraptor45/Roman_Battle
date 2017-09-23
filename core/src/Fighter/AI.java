@@ -63,6 +63,9 @@ public class AI extends Fighter
         executePlan(getDistanceToPlayer(player), player, delta);
     }
 
+    /*
+        analyses what the player is currently doing so that the AI can react
+     */
     private boolean analysePlayerAction(Player player)
     {
         switch (player.getCurrentFightingState())
