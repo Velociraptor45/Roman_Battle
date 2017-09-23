@@ -42,6 +42,8 @@ public class Fighter extends Sprite
     protected Animation <TextureRegion> runAnimationLeft;
     protected Animation <TextureRegion> jump;
     protected Animation <TextureRegion> jumpLeft;
+    protected Animation <TextureRegion> stunAnimation;
+    protected Animation <TextureRegion> stunLeftAnimation;
 
 
 
@@ -120,6 +122,25 @@ public class Fighter extends Sprite
         frames.clear();
 
 
+        frames.add(new TextureRegion(atlas.findRegion("Stun_C2")));
+        frames.add(new TextureRegion(atlas.findRegion("Stun_C3")));
+        frames.add(new TextureRegion(atlas.findRegion("Stun_C4")));
+        stunAnimation = new Animation<TextureRegion>(1f/10,frames);
+        frames.clear();
+
+        TextureRegion stun1 = new TextureRegion(atlas.findRegion("Stun_C2"));
+        TextureRegion stun2 = new TextureRegion(atlas.findRegion("Stun_C3"));
+        TextureRegion stun3 = new TextureRegion(atlas.findRegion("Stun_C4"));
+        stun1.flip(true,false);
+        stun2.flip(true,false);
+        stun3.flip(true,false);
+        frames.add(stun1);
+        frames.add(stun2);
+        frames.add(stun3);
+        stunLeftAnimation = new Animation<TextureRegion>(1f/10,frames);
+        frames.clear();
+
+
         // init Textures
         duck = new TextureRegion(atlas.findRegion("DUCK_1_C"));
         duckLeft = new TextureRegion(atlas.findRegion("DUCK_1_C"));
@@ -185,8 +206,10 @@ public class Fighter extends Sprite
     public TextureRegion getFrame(float delta){
         TextureRegion region;
 
-
-        if (fightingState == NONE) {
+        if(stunned){
+            region = getStunAnimation();
+        }
+        else if (fightingState == NONE) {
             region = getMoveState();
 
           }else {
@@ -197,6 +220,16 @@ public class Fighter extends Sprite
         previousMovementState = currentMovementState;
 
 
+        return region;
+    }
+
+    private TextureRegion getStunAnimation (){
+        TextureRegion region;
+        if (facingLeft){
+            region = new TextureRegion(stunLeftAnimation.getKeyFrame(stateTimer,true));
+        }else {
+            region = new TextureRegion(stunAnimation.getKeyFrame(stateTimer,true));
+        }
         return region;
     }
 

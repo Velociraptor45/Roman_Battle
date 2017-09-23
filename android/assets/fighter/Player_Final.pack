@@ -1,95 +1,116 @@
 
-AI.png
+Player_Final.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 HIT_HIGH2_C
   rotate: false
-  xy: 1, 230
+  xy: 1, 730
   size: 157, 281
   orig: 157, 281
   offset: 0, 0
   index: -1
 HIT_LEFT_C
   rotate: false
-  xy: 160, 250
+  xy: 160, 750
   size: 166, 261
   orig: 166, 261
   offset: 0, 0
   index: -1
 HIT_RIGHT_C
   rotate: false
-  xy: 328, 258
+  xy: 328, 758
   size: 171, 253
   orig: 171, 253
   offset: 0, 0
   index: -1
 JUMP1_C
   rotate: false
-  xy: 501, 245
+  xy: 1, 462
   size: 123, 266
   orig: 123, 266
   offset: 0, 0
   index: -1
 IDLE_C
   rotate: false
-  xy: 626, 249
+  xy: 1, 198
+  size: 122, 262
+  orig: 122, 262
+  offset: 0, 0
+  index: -1
+Stun_C2
+  rotate: false
+  xy: 501, 749
+  size: 122, 262
+  orig: 122, 262
+  offset: 0, 0
+  index: -1
+Stun_C3
+  rotate: false
+  xy: 625, 749
+  size: 122, 262
+  orig: 122, 262
+  offset: 0, 0
+  index: -1
+Stun_C4
+  rotate: false
+  xy: 749, 749
   size: 122, 262
   orig: 122, 262
   offset: 0, 0
   index: -1
 WALK2_C
   rotate: false
-  xy: 750, 249
+  xy: 873, 749
   size: 122, 262
   orig: 122, 262
   offset: 0, 0
   index: -1
-BLOCK_1_C
-  rotate: false
-  xy: 874, 262
-  size: 120, 249
-  orig: 120, 249
-  offset: 0, 0
-  index: -1
 JUMP3_C
   rotate: false
-  xy: 1, 33
+  xy: 1, 1
   size: 105, 195
   orig: 105, 195
   offset: 0, 0
   index: -1
-DUCK_1_C
+BLOCK_1_C
   rotate: false
-  xy: 108, 57
-  size: 114, 171
-  orig: 114, 171
+  xy: 126, 479
+  size: 120, 249
+  orig: 120, 249
   offset: 0, 0
   index: -1
 WALK1_C
   rotate: false
-  xy: 224, 1
+  xy: 248, 501
   size: 88, 247
   orig: 88, 247
   offset: 0, 0
   index: -1
 JUMP2_C
   rotate: false
-  xy: 314, 14
+  xy: 338, 522
   size: 115, 234
   orig: 115, 234
   offset: 0, 0
   index: -1
 JUMP_KICK_C
   rotate: false
-  xy: 431, 78
+  xy: 455, 582
   size: 122, 165
   orig: 122, 165
   offset: 0, 0
   index: -1
+DUCK_1_C
+  rotate: false
+  xy: 579, 605
+  size: 94, 142
+  orig: 94, 142
+  offset: 0, 0
+  index: -1
 JUMP4_C
   rotate: false
-  xy: 555, 109
+  xy: 675, 613
   size: 81, 134
   orig: 81, 134
   offset: 0, 0

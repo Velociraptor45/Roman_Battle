@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Intersector;
@@ -37,6 +38,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     private MainClass mainClass;
     private Player player;
     private AI ai;
+    private Texture background;
     private TextureAtlas atlasAI;
     private TextureAtlas atlasPlayer;
     private Skin wonRoundsSkin;
@@ -70,9 +72,10 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     public GameClass(MainClass mainClass, int maxWon, int curWon)
     {
         this.mainClass = mainClass;
+        background = new Texture("fighter/Arena.png");
 
-        atlasAI = new TextureAtlas(Gdx.files.internal("fighter/AI.pack"));
-        atlasPlayer = new TextureAtlas((Gdx.files.internal("fighter/player.pack")));
+        atlasAI = new TextureAtlas(Gdx.files.internal("fighter/AI_Final.pack"));
+        atlasPlayer = new TextureAtlas((Gdx.files.internal("fighter/Player_Final.pack")));
 
         player = new Player(atlasPlayer, GameValues.PLAYER_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
         ai = new AI(0, atlasAI, GameValues.AI_ORIGINAL_X, GameValues.FIGHTER_ORIGINAL_HEIGHT);
@@ -101,6 +104,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     {
         gameStage = new Stage();
         Gdx.input.setInputProcessor(gameStage);
+
 
         movementButtonsTable = new Table();
         jbaButtonsTable = new Table();
@@ -654,6 +658,7 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         }
 
         mainClass.getSpriteBatch().begin();
+        mainClass.getSpriteBatch().draw(background,0,0, Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         mainClass.getSpriteBatch().draw(player, player.getX(), player.getY());
         mainClass.getSpriteBatch().draw(ai, ai.getX(), ai.getY());
         mainClass.getSpriteBatch().end();
