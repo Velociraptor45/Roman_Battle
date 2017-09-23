@@ -4,11 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -31,9 +35,13 @@ public class MainMenu implements Screen, InputProcessor {
     GameClass game;
 
     private Stage menuStage;
-    private Table menuStartButtonTable, menuBottomButtonsTable;
+    private Table menuStartButtonTable, menuBottomButtonsTable, highscoreMenuTable, highscoreScoreTable;
+    private Image highscoreMenuImage;
+    private Label scoreLabel;
 
     private Button menuHighscoreButton, menuStartButton, menuTutorialButton;
+
+    private boolean isHighscoreDisplayed, isTutorialDisplayed;
 
     ///File
     private int maxWonGames;
@@ -62,21 +70,51 @@ public class MainMenu implements Screen, InputProcessor {
         menuStartButtonTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         menuBottomButtonsTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
+        highscoreMenuTable = new Table();
+        highscoreScoreTable = new Table();
+        highscoreMenuTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        highscoreScoreTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         setupTutorialButton();
         setupHighscoreButton();
         setupStartButton();
         setupBackgroundImage();
+        setupHighscoreMenu();
 
+        highscoreMenuTable.center();
+        highscoreScoreTable.center();
         menuBottomButtonsTable.bottom().left();
 
         menuStage.addActor(menuStartButtonTable);
         menuStage.addActor(menuBottomButtonsTable);
+        menuStage.addActor(highscoreMenuTable);
+        menuStage.addActor(highscoreScoreTable);
+
+        isHighscoreDisplayed = false;
+        isTutorialDisplayed = false;
 
         maxWonGames = 0;
         currentlyWonGames = 0;
         readFile();
         game = new GameClass(mainClass, maxWonGames, currentlyWonGames);
+    }
+
+    private void setupHighscoreScore()
+    {
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = new BitmapFont(Gdx.files.internal("ui/menu/font/tarzan.fnt"));
+        labelStyle.fontColor = Color.BLACK;
+        scoreLabel = new Label(Integer.toString(maxWonGames), labelStyle);
+
+    }
+
+    private void setupHighscoreMenu()
+    {
+        TextureAtlas atlas = new TextureAtlas("ui/menu/highscoreMenu.pack");
+
+        Skin skin = new Skin(atlas);
+
+        highscoreMenuImage = new Image(skin, "highscoreMenu.up");
     }
 
     private void setupBackgroundImage()
@@ -138,7 +176,7 @@ public class MainMenu implements Screen, InputProcessor {
         TextureAtlas menuSettingsButtonAtlas = new TextureAtlas("ui/menu/highscoreButton.pack");
         Skin menuSettingsButtonSkin = new Skin(menuSettingsButtonAtlas);
 
-        Button.ButtonStyle style = new Button.ButtonStyle();
+        final Button.ButtonStyle style = new Button.ButtonStyle();
         style.up = menuSettingsButtonSkin.getDrawable("highscoreButton.up");
         style.down = menuSettingsButtonSkin.getDrawable("highscoreButton.down");
 
@@ -147,7 +185,19 @@ public class MainMenu implements Screen, InputProcessor {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                //TODO set screen for Setting
+                if(isHighscoreDisplayed)
+                {
+                    isHighscoreDisplayed = false;
+                    highscoreMenuTable.clearChildren();
+                    highscoreScoreTable.clearChildren();
+                }
+                else
+                {
+                    setupHighscoreScore();
+                    isHighscoreDisplayed = true;
+                    highscoreMenuTable.add(highscoreMenuImage);
+                    highscoreScoreTable.add(scoreLabel);
+                }
             }
         });
 
