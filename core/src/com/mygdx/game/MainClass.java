@@ -3,10 +3,6 @@ package com.mygdx.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-
-
-// IN DIESER KLASSE BRAUCHEN WIR NICHTS MEHR MACHEN ---- diesen kommentar können wir dann löschen !!!!!!!!!!!
-
 // extending Game helps to manage different Screen it´s the "root" of the game or entry-point
 public class MainClass extends Game  {
     //serves as container to draw bunch of graphics, for this reason instantiate only once for all classes

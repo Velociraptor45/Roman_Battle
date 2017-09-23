@@ -93,6 +93,9 @@ public class Plan
         movement = state;
     }
 
+    /*
+        if the fighter should walk left/right alternately this method changes the current walking direction
+     */
     private void changeMovement()
     {
         Fighter.FighterMovementState state = movement;

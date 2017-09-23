@@ -25,7 +25,7 @@ public class GameValues
     public static final int FIGHTER_HEALTH = 100;
 
     public static final int FIGHTER_MAX_JUMP_HEIGHT = 450;
-    public static final int FIGHTER_ORIGINAL_HEIGHT = 200;
+    public static final int FIGHTER_ORIGINAL_HEIGHT = 250;
     public static final int PLAYER_ORIGINAL_X = 0;
     public static final int AI_ORIGINAL_X = Gdx.graphics.getWidth() - 150;
     public static final int AI_MOVING_SPEED = 5;
@@ -35,17 +35,17 @@ public class GameValues
     //moves the player left because of bigger texture size while attacking left
     public static final int PLAYER_ATTACK_LEFT_SPEED = 49;
 
-    public static final int PLAYER_DAMAGE = 100;
-    public static final int AI_DAMAGE = 10;
+    public static final int PLAYER_DAMAGE = 10;
+    public static final int AI_DAMAGE = 15;
 
-    public static final float FIGHTER_STUN_CHANCE = 50;
+    public static final float FIGHTER_STUN_CHANCE = 20;
 
     public static final float FIGHTER_ATTACK_DURATION = 0.2f;
     public static final float FIGHTER_ATTACK_UP_DURATION = 0.2f;
     public static final float FIGHTER_ATTACK_DOWN_DURATION = 0.4f;
     public static final float FIGHTER_JUMP_DURATION = 0.8f;
     public static final float FIGHTER_BLOCK_DURATION = 0.3f;
-    public static final float FIGHTER_STUN_DURATION = 0.2f;
+    public static final float FIGHTER_STUN_DURATION = 0.5f;
     //////////////////////////////////////////////////////////////////////
 
     //AI

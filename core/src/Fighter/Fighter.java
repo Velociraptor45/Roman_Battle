@@ -53,7 +53,7 @@ public class Fighter extends Sprite
     protected FighterMovementState previousMovementState;
 
     protected boolean stunned;
-    protected float stunTimer, stateTimer, blockTimer, attackTimer, attackUpTimer, attackDownTimer, takeDamageTimer;
+    protected float stunTimer, canGetStunnedTimer, stateTimer, blockTimer, attackTimer, attackUpTimer, attackDownTimer, takeDamageTimer;
 
     protected short wonRounds = 0;
 
@@ -73,6 +73,7 @@ public class Fighter extends Sprite
         attackDownTimer = 0f;
         attackUpTimer = 0f;
         stunTimer = 0f;
+        canGetStunnedTimer = 0f;
         takeDamageTimer = GameValues.FIGHTER_ATTACK_DURATION;
         wonRounds = 0;
 
@@ -197,6 +198,10 @@ public class Fighter extends Sprite
         if(takeDamageTimer <= GameValues.FIGHTER_ATTACK_DURATION)
         {
             takeDamageTimer += delta;
+        }
+        if(canGetStunnedTimer <= GameValues.FIGHTER_ATTACK_DURATION);
+        {
+            canGetStunnedTimer += delta;
         }
     }
 
@@ -435,7 +440,11 @@ public class Fighter extends Sprite
 
     public void stun(boolean status)
     {
-        stunned = status;
+        if(canGetStunnedTimer >= GameValues.FIGHTER_ATTACK_DURATION)
+        {
+            stunned = status;
+            canGetStunnedTimer = 0f;
+        }
     }
 
     public boolean isStunned(float delta)
@@ -537,6 +546,7 @@ public class Fighter extends Sprite
         HP = GameValues.FIGHTER_HEALTH;
         fightingState = FighterFightingState.NONE;
         movementState = FighterMovementState.STANDING;
+        stunned = false;
     }
 
     public void resetWonRounds()

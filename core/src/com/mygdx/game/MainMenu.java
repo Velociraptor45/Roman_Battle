@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -23,13 +22,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 /**
  * Created by AboutWhiteR on 12.08.2017.
  */
-
-
-//HIER ENTSTEHT DAS HAUPTMENÜ ICH HABE NUR EINEN PSEUDOBUTTON EINGEFÜGT KLICKT MAN DIESEN (ODER IRGENDWO ANDERS AUF DEM BILDSCHIRM)
-//STARTET DAS SPIEL MAN BEFINDET SICH DANN IN DER KLASSE GAME DIE AUCH WIEDER SCREEN IMPLEMENTIERT
-//DIESEN KOMMENTAR KÖNNEN WIR DANN LÖSCHEN IST NUR FÜR EUCH btw der Inputprocessor erkennt userinput und kann den verarbeiten
-// multitouch würde man aber noch etwas anders verarbeiten mit multiplex oder so hab das noch nicht so genau gelesen
-
 
 public class MainMenu implements Screen, InputProcessor {
     //do we need to get the spriteBatch

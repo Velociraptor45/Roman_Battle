@@ -677,6 +677,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         gameStage.draw();
     }
 
+    /*
+        resets all values for restart of game or round
+     */
     private void reset()
     {
         if(gameIsPaused)
@@ -730,8 +733,6 @@ public class GameClass implements Screen, GestureDetector.GestureListener
     {
         float accY = Gdx.input.getAccelerometerX();
         float accX = Gdx.input.getAccelerometerY();
-        //Gdx.app.log("AccX", Float.toString(accX));
-        //Gdx.app.log("AccY", Float.toString(accY));
         if (Math.abs(accX) > GameValues.GAME_ACCELEROMETER_X_MIN_SPEED)
         {
             if (Math.abs(accY) > Math.abs(accX) && !attack && !block)
@@ -743,13 +744,11 @@ public class GameClass implements Screen, GestureDetector.GestureListener
                     //attack up
                     attackUp = true;
                     attack = true;
-                    //Gdx.app.log("AccN", "attack Up" + accY);
                 } else if (!player.isOnGround() && !attackUp)
                 {
                     //attack down
                     attackDown = true;
                     attack = true;
-                    //Gdx.app.log("AccN", "attack down" + accY);
                 }
             } else
             {
@@ -764,7 +763,6 @@ public class GameClass implements Screen, GestureDetector.GestureListener
                     {
                         attack = true;
                     }
-                    //Gdx.app.log("AccN", "attack " + accX);
                 }
             }
         } else if (Math.abs(accY) > GameValues.GAME_ACCELEROMETER_Y_MIN_SPEED)
@@ -775,12 +773,10 @@ public class GameClass implements Screen, GestureDetector.GestureListener
                 {
                     attackUp = true;
                     attack = true;
-                    //Gdx.app.log("AccN", "attack Up" + accY);
                 } else if (!player.isOnGround() && !attackUp)
                 {
                     attackDown = true;
                     attack = true;
-                    //Gdx.app.log("AccN", "attack down" + accY);
                 }
             }
         }
@@ -852,12 +848,18 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         healthAI.setScaleX(health);
     }
 
+    /*
+        sets the winner of a round
+     */
     private void hasWon(Fighter winner)
     {
         winner.roundWon();
         updateDisplayedWonGames();
     }
 
+    /*
+        updates the displayed amount of won rounds
+     */
     private void updateDisplayedWonGames()
     {
         playerWonRoundsTable.clearChildren();
@@ -886,6 +888,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         postMatchImage = postMatchImageKO;
     }
 
+    /*
+        sets the screen after a match is over
+     */
     private void showPostMatchScreen()
     {
         prePostScreenTable.add(postMatchImage);
@@ -973,6 +978,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         }
     }
 
+    /*
+        sets the current fighting state of the player
+     */
     private void switchPlayerFightingState(float delta)
     {
         if (attackUp && attack)
@@ -999,6 +1007,9 @@ public class GameClass implements Screen, GestureDetector.GestureListener
         }
     }
 
+    /*
+        sets the current movement state of the player
+     */
     private void switchPlayerMovementState()
     {
         if (duck)

@@ -16,6 +16,10 @@ public class AI extends Fighter
     //the "try..." timers make sure that the AI has just one chance per attack to block, dodge, etc. this attack of the player
     private float tryBlockTimer, tryDodgeForAttackDownTimer, tryDodgeForAttackUpTimer, tryCounterAttackTimer, attackTimer;
 
+    /**
+     *
+     * @param ID: could be used for identification if there were different AI
+     */
     public AI(int ID, TextureAtlas atlas, float xPos, float yPos)
     {
         super(atlas, xPos, yPos);
@@ -147,6 +151,11 @@ public class AI extends Fighter
         return false;
     }
 
+    /*
+        evaluates if the current plan is up to date
+        if yes: continue
+        if no: calculate new plan
+     */
     private void isUpToDate(Plan currentPlan, Player player)
     {
         float distanceToPlayer = getDistanceToPlayer(player);
@@ -493,7 +502,7 @@ public class AI extends Fighter
     /**
        @param delta: time since last frame
         depending on the current movement and fighting state of the ai this method executes
-         the movement
+        the movement
      */
     private void executePlan(float distanceToPlayer, Player player, float delta)
     {
@@ -707,6 +716,9 @@ public class AI extends Fighter
         plansToExecute.add(plan);
     }
 
+    /*
+        returns the distance between AI and player
+     */
     private float getDistanceToPlayer(Player player)
     {
         if(facingLeft)
