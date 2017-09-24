@@ -194,27 +194,34 @@ public class MainMenu implements Screen, InputProcessor {
         style.pressedOffsetY = -1;
 
         tutorialPreviousButton = new Button(style);
-
         tutorialPreviousButton.addListener(new ClickListener() {
-
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                int index = 0;
+                int index ;
                 for (int i = 0; i < tutorialImages.length; i++) {
+
                     if (tutorialCurrentImage.equals(tutorialImages[i])) {
                         index = i-1;
+                        if(index < 0){
+                            tutorialCurrentImage = tutorialImages [6];
+                        }else {
+                            tutorialCurrentImage = tutorialImages[index];
+                        }
                         break;
                     }
 
                 }
-                tutorialCurrentImage = tutorialImages[index];
+
+                tutorialTable.clearChildren();
+                tutorialTable.add(tutorialPreviousButton);
+                tutorialTable.add(tutorialCurrentImage);
+                tutorialTable.add(tutorialNextButton);
 
             }
         });
 
-
-        }
+    }
 
 
 
@@ -237,15 +244,30 @@ public class MainMenu implements Screen, InputProcessor {
             @Override
             public void clicked(InputEvent event, float x, float y) {
 
-                tutorialCurrentImage = tutorialImages[1];
+                int index ;
+                for (int i = 0; i < tutorialImages.length; i++) {
 
+                    if (tutorialCurrentImage.equals(tutorialImages[i])) {
+                        index = i+1;
+                        if(index > 6){
+                            tutorialCurrentImage = tutorialImages [0];
+                        }else {
+                            tutorialCurrentImage = tutorialImages[index];
+                        }
+                        break;
+                    }
+                }
 
+                tutorialTable.clearChildren();
+                tutorialTable.add(tutorialPreviousButton);
+                tutorialTable.add(tutorialCurrentImage);
+                tutorialTable.add(tutorialNextButton);
             }
+
         });
-
-
-
     }
+
+
 
     private void setupTutorialButton()
     {

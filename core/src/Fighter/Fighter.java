@@ -221,7 +221,12 @@ public class Fighter extends Sprite
              region = getFightState();
           }
 
-        stateTimer = currentMovementState == previousMovementState? stateTimer + delta :0;//TODO !!!!!!!!!!!!!!
+
+        if (currentMovementState == previousMovementState){
+            stateTimer = stateTimer + delta;
+        } else {
+            stateTimer = 0;
+        }
         previousMovementState = currentMovementState;
 
 
