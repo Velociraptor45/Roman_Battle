@@ -1,0 +1,112 @@
+
+Tutorial.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+attack
+  rotate: false
+  xy: 1, 205
+  size: 690, 600
+  orig: 690, 600
+  offset: 0, 0
+  index: -1
+arrowLeftGreens
+  rotate: false
+  xy: 1, 103
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+arrowLeftWhite
+  rotate: false
+  xy: 693, 705
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+arrowRightGreen
+  rotate: false
+  xy: 1, 1
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+arrowRightWhite
+  rotate: false
+  xy: 103, 103
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+
+Tutorial2.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+block
+  rotate: false
+  xy: 1, 1
+  size: 690, 600
+  orig: 690, 600
+  offset: 0, 0
+  index: -1
+
+Tutorial3.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+Duck
+  rotate: false
+  xy: 1, 1
+  size: 690, 600
+  orig: 690, 600
+  offset: 0, 0
+  index: -1
+
+Tutorial4.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+hitup
+  rotate: false
+  xy: 1, 1
+  size: 690, 600
+  orig: 690, 600
+  offset: 0, 0
+  index: -1
+
+Tutorial5.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+jump
+  rotate: false
+  xy: 1, 1
+  size: 690, 600
+  orig: 690, 600
+  offset: 0, 0
+  index: -1
+
+Tutorial6.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+jumpkick
+  rotate: false
+  xy: 1, 1
+  size: 690, 600
+  orig: 690, 600
+  offset: 0, 0
+  index: -1
+
+Tutorial7.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+move_LR
+  rotate: false
+  xy: 1, 1
+  size: 690, 600
+  orig: 690, 600
+  offset: 0, 0
+  index: -1

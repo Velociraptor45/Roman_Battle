@@ -29,11 +29,12 @@ public class MainMenu implements Screen, InputProcessor {
     GameClass game;
 
     private Stage menuStage;
-    private Table menuStartButtonTable, menuBottomButtonsTable, highscoreMenuTable, highscoreScoreTable;
-    private Image highscoreMenuImage;
+    private Table menuStartButtonTable, menuBottomButtonsTable, highscoreMenuTable, highscoreScoreTable, tutorialTable;
+    private Image highscoreMenuImage, tutorialCurrentImage;
+    private Image [] tutorialImages;
     private Label scoreLabel;
 
-    private Button menuHighscoreButton, menuStartButton, menuTutorialButton;
+    private Button menuHighscoreButton, menuStartButton, menuTutorialButton,tutorialPreviousButton, tutorialNextButton;
 
     private Music backgroundMusic;
 
@@ -72,9 +73,13 @@ public class MainMenu implements Screen, InputProcessor {
         highscoreScoreTable = new Table();
         highscoreMenuTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         highscoreScoreTable.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        tutorialTable = new Table();
+        tutorialTable.setBounds(0,0,Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         setupTutorialButton();
         setupHighscoreButton();
+        setupTutorialPreviousButton();
+        setupTutorialNextButton();
         setupStartButton();
         setupBackgroundImage();
         setupHighscoreMenu();
@@ -82,11 +87,13 @@ public class MainMenu implements Screen, InputProcessor {
         highscoreMenuTable.center();
         highscoreScoreTable.center();
         menuBottomButtonsTable.bottom().left();
+        tutorialTable.center();
 
         menuStage.addActor(menuStartButtonTable);
         menuStage.addActor(menuBottomButtonsTable);
         menuStage.addActor(highscoreMenuTable);
         menuStage.addActor(highscoreScoreTable);
+        menuStage.addActor(tutorialTable);
 
         isHighscoreDisplayed = false;
         isTutorialDisplayed = false;
@@ -124,6 +131,23 @@ public class MainMenu implements Screen, InputProcessor {
         highscoreMenuImage = new Image(skin, "highscoreMenu.up");
     }
 
+    private void setupTutorial(){
+        TextureAtlas atlas = new TextureAtlas("ui/tutorial/Tutorial.pack");
+        Skin skin = new Skin(atlas);
+        tutorialImages = new Image[7];
+        tutorialImages[0]= new Image(skin,"move_LR");
+        tutorialImages[1]= new Image(skin,"attack");
+        tutorialImages[2]= new Image(skin,"block");
+        tutorialImages[3]= new Image(skin,"Duck");
+        tutorialImages[4]= new Image(skin,"jump");
+        tutorialImages[5]= new Image(skin,"jumpkick");
+        tutorialImages[6]= new Image(skin,"hitup");
+
+
+        tutorialCurrentImage =tutorialImages[0];
+
+    }
+
     private void setupBackgroundImage()
     {
         TextureAtlas atlas = new TextureAtlas("ui/menu/menuBackground.pack");
@@ -158,6 +182,71 @@ public class MainMenu implements Screen, InputProcessor {
         menuStartButtonTable.add(menuStartButton);
     }
 
+    private void setupTutorialPreviousButton(){
+        TextureAtlas atlas = new TextureAtlas("ui/tutorial/Tutorial.pack");
+        Skin skin = new Skin(atlas);
+
+
+        Button.ButtonStyle style = new Button.ButtonStyle();
+        style.up = skin.getDrawable("arrowLeftWhite");
+        style.down = skin.getDrawable("arrowLeftGreens");
+        style.pressedOffsetX = 1;
+        style.pressedOffsetY = -1;
+
+        tutorialPreviousButton = new Button(style);
+
+        tutorialPreviousButton.addListener(new ClickListener() {
+
+
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                int index = 0;
+                for (int i = 0; i < tutorialImages.length; i++) {
+                    if (tutorialCurrentImage.equals(tutorialImages[i])) {
+                        index = i-1;
+                        break;
+                    }
+
+                }
+                tutorialCurrentImage = tutorialImages[index];
+
+            }
+        });
+
+
+        }
+
+
+
+    private void setupTutorialNextButton(){
+
+        TextureAtlas atlas = new TextureAtlas("ui/tutorial/Tutorial.pack");
+        Skin skin = new Skin(atlas);
+
+        Button.ButtonStyle style = new Button.ButtonStyle();
+        style.up = skin.getDrawable("arrowRightWhite");
+        style.down = skin.getDrawable("arrowRightGreen");
+        style.pressedOffsetX = 1;
+        style.pressedOffsetY = -1;
+
+        tutorialNextButton = new Button(style);
+
+        tutorialNextButton.addListener(new ClickListener() {
+
+
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+
+                tutorialCurrentImage = tutorialImages[1];
+
+
+            }
+        });
+
+
+
+    }
+
     private void setupTutorialButton()
     {
         TextureAtlas menuTutorialButtonAtlas = new TextureAtlas("ui/menu/tutorial.pack");
@@ -172,7 +261,16 @@ public class MainMenu implements Screen, InputProcessor {
             @Override
             public void clicked(InputEvent event, float x, float y)
             {
-                //TODO set Screen for Tutorial
+                if(isTutorialDisplayed){
+                    isTutorialDisplayed = false;
+                    tutorialTable.clearChildren();
+                } else if (!isHighscoreDisplayed && ! isTutorialDisplayed){
+                    setupTutorial();
+                    isTutorialDisplayed = true;
+                    tutorialTable.add(tutorialPreviousButton);
+                    tutorialTable.add(tutorialCurrentImage);
+                    tutorialTable.add(tutorialNextButton);
+                }
             }
         });
 
